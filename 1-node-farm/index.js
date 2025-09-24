@@ -1,5 +1,6 @@
 const http = require('http')
 const fs = require('fs')
+const url = require('url')
 let readError = false
 let fileJsonData = null
 try {
@@ -35,31 +36,33 @@ function replaceTemplate(template, product) {
 
 const server = http.createServer((req, res) => {
 
+    const { query, pathname } = url.parse(req.url, true);
 
 
-
-    
-    if(req.url === '/' || req.url === '/overview'){
-        res.writeHead(200,{'Content-type': 'text/html'})
+    if (pathname === '/' || pathname === '/overview') {
+        res.writeHead(200, { 'Content-type': 'text/html' })
         const cards = productData.map(el => replaceTemplate(templateCardData, el)).join("");
         const overviewHTML = templateOverviewData.replace('{%PRODUCTCARD%}', cards);
         res.end(overviewHTML)
     }
-    else if(req.url === '/product'){
-        res.end('This is the product')
+    else if (pathname === '/product') {
+        productId = url.parse(req.url, true).query.id;
+        const templateRendered = replaceTemplate(templateProductData, productData[productId]);
+        res.writeHead(200, { 'Content-type': 'text/html' })
+        res.end(templateRendered)
     }
-    else if(req.url === '/api'){
-        
-            if (readError) {
-                res.writeHead(500, { 'Content-type': 'application/json' })
-                res.end(JSON.stringify({ error: 'Could not read data file' }))
-                return
-            }
-            
-            res.writeHead(200, { 'Content-type': 'application/json' })
-            res.end(JSON.stringify(productData))
-        
-    }else{
+    else if (pathname === '/api') {
+
+        if (readError) {
+            res.writeHead(500, { 'Content-type': 'application/json' })
+            res.end(JSON.stringify({ error: 'Could not read data file' }))
+            return
+        }
+
+        res.writeHead(200, { 'Content-type': 'application/json' })
+        res.end(JSON.stringify(productData))
+
+    } else {
         res.writeHead(404, {
             'Content-type': 'text/html',
         })
