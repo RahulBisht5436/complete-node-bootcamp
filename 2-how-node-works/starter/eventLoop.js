@@ -1,10 +1,28 @@
-const fs = require('fs')
-console.log('Hello from the top-level code of eventLoop.js')
+const { CONNREFUSED } = require('dns');
+const event = require('events');
+const fs = require('fs');
+const http = require('http');
+const eventEmitter = new event.EventEmitter();  
+eventEmitter.on('order-pizza', (size, topping) => {
+    console.log(`Order received! Preparing a ${size} pizza with ${topping}`);
+});
+eventEmitter.emit('order-pizza', 'large', 'mushrooms and bananas');
 
-setTimeout(() => console.log('0 sec timer'), 0)
-setImmediate(() => console.log('Immediate timer'))
 
-fs.readFile(`${__dirname}/test-file.txt`, 'utf-8', (err, data) => {  
-    console.log('I/O finished')
-    }
-)
+
+const server = http.createServer();
+server.on('request', (req, res) => {
+    console.log('Request received');
+    res.end('Request received');
+});
+console.log( `${__dirname}`);
+const readStreamfiles = fs.createReadStream(`${__dirname}/test-file.txt`, 'utf-8');
+const writeStreamfiles = fs.createWriteStream(`${__dirname}/test-file-copy.txt`);
+
+readStreamfiles.pipe(writeStreamfiles);
+
+writeStreamfiles.on('finish', () => {
+    console.log('File copied successfully using pipe!');
+});
+
+
