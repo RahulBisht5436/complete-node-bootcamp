@@ -1,0 +1,22 @@
+{
+  "name": "complete-node-bootcamp",
+  "version": "1.0.0",
+  "description": "This repo contains starter files and the finished project files for all the projects contained in the course (complete repo size is **288MB**).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RahulBisht5436/complete-node-bootcamp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RahulBisht5436/complete-node-bootcamp/issues"
+  },
+  "homepage": "https://github.com/RahulBisht5436/complete-node-bootcamp#readme",
+  "dependencies": {
+    "superagent": "^10.2.3"
+  }
+}
