@@ -3,15 +3,15 @@ const fs = require('fs');
 const app = express();
 const port = 3000;
 
+// LEARN : middle-ware
 app.use(express.json());
+
 
 // Read tours data once when server starts
 const toursData = JSON.parse(
     fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf-8')
 );
-
-// NEW LOGIC GET tours
-app.get('/api/v1/tours', (req, res) => {
+const getAllTours = (req, res) => {
     if (toursData && toursData.length > 0) {
         res.status(200).json({
             status: 'success',
@@ -26,10 +26,8 @@ app.get('/api/v1/tours', (req, res) => {
             message: 'Internal server error, no data found',
         });
     }
-});
-
-// NEW LOGIC POST new tour
-app.post('/api/v1/tours', (req, res) => {
+}
+const getTour = (req, res) => {
     if (!req.body || Object.keys(req.body).length === 0) {
         return res.status(400).json({
             status: 'fail',
@@ -65,10 +63,8 @@ app.post('/api/v1/tours', (req, res) => {
             });
         }
     );
-});
-
-// NEW LOGIC
-app.get('/api/v1/tours/:id', (req, res) => {
+}
+const addTour = (req, res) => {
     console.log(req.params.id)
     const queryData = toursData.find(el => el.id == req.params.id * 1)
     if (!queryData) {
@@ -86,11 +82,8 @@ app.get('/api/v1/tours/:id', (req, res) => {
         })
     }
 
-});
-
-
-// NEW LOGIC :  Making a path request
-app.patch('/api/v1/tours/:id', (req, res) => {
+}
+const updateTour = (req, res) => {
     const toursId = req.params.id
     if (!toursId) {
         res.status(400).json({
@@ -107,10 +100,38 @@ app.patch('/api/v1/tours/:id', (req, res) => {
             }
         })
     }
-    // NOTE : I have to update in the file 
+}
+const deleteTour = (req, res) => {
+    const toursId = req.params.id
+    if (!toursId) {
+        res.status(400).json({
+            status: "failed",
+            message: "no ID provided"
+        }
+        )
+    } else {
+        res.status(204).json({
+            status: "success",
+            message: "data is deleted",
+            data: {
+                data: null
+            }
+        })
+    }
+}
+
+// app.get('/api/v1/tours', getAllTours );
+// app.post('/api/v1/tours', getTour );
+// app.get('/api/v1/tours/:id', addTour);
+// app.patch('/api/v1/tours/:id', updateTour)
+// app.delete("/api/v1/tours/:id", deleteTour)
 
 
-})
+// LEARN : new way of routing
+
+app.route('/api/v1/tours').get(getAllTours).post(getTour)
+app.route('/api/v1/tours/:id').get(addTour).patch(updateTour).delete(deleteTour)
+
 
 app.listen(port, () => {
     console.log(`App running on port ${port}...`);
