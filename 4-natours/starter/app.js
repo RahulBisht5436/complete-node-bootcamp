@@ -1,17 +1,27 @@
 const express = require('express');
 const fs = require('fs');
 const app = express();
+const morgan = require('morgan')
+
+
 const port = 3000;
+// LEARN : third party middleware function
+
 
 // LEARN : middle-ware
+
+app.use(morgan('dev'))
 app.use(express.json());
-
-
+app.use((req, res, next) => {
+    req.requestTime = new Date().toISOString();
+    next();
+});
 // Read tours data once when server starts
 const toursData = JSON.parse(
     fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf-8')
 );
 const getAllTours = (req, res) => {
+    console.log(req.requestTime)
     if (toursData && toursData.length > 0) {
         res.status(200).json({
             status: 'success',
@@ -119,19 +129,55 @@ const deleteTour = (req, res) => {
         })
     }
 }
-
-// app.get('/api/v1/tours', getAllTours );
-// app.post('/api/v1/tours', getTour );
-// app.get('/api/v1/tours/:id', addTour);
-// app.patch('/api/v1/tours/:id', updateTour)
-// app.delete("/api/v1/tours/:id", deleteTour)
-
+const getAllUsers = (req,res)=>{
+    res.json({
+        status:'failed',
+        message:'End point not ready'
+    })
+}
+const createUser  = (req,res)=>{
+    res.json({
+        status:'failed',
+        message:'End point not ready'
+    })
+}
+const getUser     = (req,res)=>{
+    res.json({
+        status:'failed',
+        message:'End point not ready'
+    })
+}
+const updateUser  = (req,res)=>{
+    res.json({
+        status:'failed',
+        message:'End point not ready'
+    })
+}
+const deleteUser  = (req,res)=>{
+    res.json({
+        status:'failed',
+        message:'End point not ready'
+    })
+}
 
 // LEARN : new way of routing
 
-app.route('/api/v1/tours').get(getAllTours).post(getTour)
-app.route('/api/v1/tours/:id').get(addTour).patch(updateTour).delete(deleteTour)
 
+// NOTE : tours resouce 
+
+// LEARN : make use of express.Router()
+const tourRouter = express.Router()
+app.use('/api/v1/tours', tourRouter)
+
+tourRouter.route('/').get(getAllTours).post(getTour)
+tourRouter.route('/:id').get(addTour).patch(updateTour).delete(deleteTour)
+
+// NOTE : Users Resource
+const userRouter = express.Router()
+app.use('/api/v1/users', userRouter);
+
+userRouter.route('/').get(getAllUsers).post(createUser)
+userRouter.route('/:id').get(getUser).patch(updateUser).delete(deleteUser)
 
 app.listen(port, () => {
     console.log(`App running on port ${port}...`);
