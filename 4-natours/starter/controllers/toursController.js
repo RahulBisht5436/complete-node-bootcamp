@@ -3,6 +3,56 @@ const path = require('path');
 const dataPath = path.join(__dirname, '../dev-data/data/tours-simple.json');
 let toursData = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 
+const validateToursData = (req, res, next) => {
+    const { name, duration, difficulty, price } = req.body;
+
+    if (!name || !duration || !difficulty || !price) {
+        return res.status(400).json({
+            status: "failed",
+            message: "Request body must include name, duration, difficulty, and price",
+        });
+    }
+
+    if (typeof name !== "string") {
+        return res.status(400).json({
+            status: "failed",
+            message: "Name must be a string",
+        });
+    }
+
+    if (typeof difficulty !== "string") {
+        return res.status(400).json({
+            status: "failed",
+            message: "Difficulty must be a string",
+        });
+    }
+
+    if (typeof duration !== "number") {
+        return res.status(400).json({
+            status: "failed",
+            message: "Duration must be a number",
+        });
+    }
+
+    if (typeof price !== "number") {
+        return res.status(400).json({
+            status: "failed",
+            message: "Price must be a number",
+        });
+    }
+    next();
+};
+
+const checkId = (req, res, next, value) => {
+    console.log("inside the middleware function")
+    if (req.params.id * 1 > toursData.length) {
+        return res.status(404).json({
+            status: "failed",
+            message: "invalid id"
+        })
+    }
+    next()
+}
 const getAllTours = (req, res) => {
     console.log(req.requestTime);
     if (toursData && toursData.length > 0) {
@@ -119,4 +169,4 @@ const deleteTour = (req, res) => {
     );
 };
 
-module.exports = {getAllTours ,createTour, getTour, updateTour,deleteTour}
+module.exports = { getAllTours, createTour, getTour, updateTour, deleteTour, checkId, validateToursData }
