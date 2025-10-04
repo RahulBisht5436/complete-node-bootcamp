@@ -9,7 +9,7 @@ try {
 } catch (err) {
     readError = true
     const errorMessage = err.message
-    console.log('Error reading file:', errorMessage)
+    console.log('Errorreading file:', errorMessage)
 }
 
 const templateOverviewData = fs.readFileSync(`${__dirname}/starter/templates/template-overview.html`, 'utf-8');
