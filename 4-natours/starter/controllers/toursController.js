@@ -3,70 +3,61 @@ const Tour = require('../Models/tours');
 const dataPath = path.join(__dirname, '../dev-data/data/tours-simple.json');
 // let toursData = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 
-const validateToursData = (req, res, next) => {
-    const { name, duration, difficulty, price } = req.body;
-
-    if (!name || !duration || !difficulty || !price) {
-        return res.status(400).json({
-            status: "failed",
-            message: "Request body must include name, duration, difficulty, and price",
-        });
+// LEARN : how to get data from real database to get all tours
+const getAllTours = async (req, res) => {
+    try {
+        const allTours = await Tour.find();
+        console.log(allTours);
+        res.status(200).json({
+            status: 'success',
+            results: allTours.length,
+            data: {
+                tours: allTours
+            }
+        });    
+    } catch (error) {
+        res.status(404).json({
+            status: 'failed to get data',
+            message: error
+        })
     }
-
-    if (typeof name !== "string") {
-        return res.status(400).json({
-            status: "failed",
-            message: "Name must be a string",
-        });
-    }
-
-    if (typeof difficulty !== "string") {
-        return res.status(400).json({
-            status: "failed",
-            message: "Difficulty must be a string",
-        });
-    }
-
-    if (typeof duration !== "number") {
-        return res.status(400).json({
-            status: "failed",
-            message: "Duration must be a number",
-        });
-    }
-
-    if (typeof price !== "number") {
-        return res.status(400).json({
-            status: "failed",
-            message: "Price must be a number",
-        });
-    }
-    next();
+    
 };
 
-const getAllTours = (req, res) => {
-    res.status(200).json({
-        status: 'success',
-    });
-};
+// LEARN : how to use real database to create new tour
+const createTour = async (req, res) => {
+    try {
+        if (!req.body || Object.keys(req.body).length === 0) {
+            return res.status(400).json({
+                status: 'fail',
+                message: 'Request body is empty',
+            });
+        }
 
-const createTour = (req, res) => {
-    if (!req.body || Object.keys(req.body).length === 0) {
-        return res.status(400).json({
+        const newTour = await Tour.create(req.body);
+        res.status(201).json({
+            status: 'success',
+            data: newTour
+        });
+
+    } catch (error) {
+        res.status(400).json({
             status: 'fail',
-            message: 'Request body is empty',
-        });
+            error: "entered wrong data",
+            message: error
+        })
     }
-    res.status(201).json({
-        status: 'success'
-    });
+
 };
+
 
 const getTour = (req, res) => {
+    
     const id = Number(req.params.id);
     const queryData = toursData.find(el => el.id === id);
     res.status(200).json({
         status: 'success',
-       });
+    });
 };
 
 const updateTour = (req, res) => {
@@ -74,7 +65,7 @@ const updateTour = (req, res) => {
     const tourIndex = toursData.findIndex(el => el.id === id);
     res.status(200).json({
         status: 'success',
-       });
+    });
 };
 
 const deleteTour = (req, res) => {
@@ -82,7 +73,7 @@ const deleteTour = (req, res) => {
     const tourIndex = toursData.findIndex(el => el.id === id);
     res.status(204).json({
         status: 'success',
-       });
+    });
 };
 
-module.exports = { getAllTours, createTour, getTour, updateTour, deleteTour, validateToursData }
+module.exports = { getAllTours, createTour, getTour, updateTour, deleteTour }
