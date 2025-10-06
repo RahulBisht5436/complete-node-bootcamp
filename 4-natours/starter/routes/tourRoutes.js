@@ -5,7 +5,7 @@ const path = require('path');
 const tourRouter = express.Router();
 
 // LEARN : this is new middle ware for interfering the value of param
-tourRouter.param('id', checkId)
+// tourRouter.param('id', checkId)
 
 const dataPath = path.join(__dirname, '../dev-data/data/tours-simple.json');
 let toursData = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
