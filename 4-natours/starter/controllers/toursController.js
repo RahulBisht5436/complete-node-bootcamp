@@ -14,14 +14,14 @@ const getAllTours = async (req, res) => {
             data: {
                 tours: allTours
             }
-        });    
+        });
     } catch (error) {
         res.status(404).json({
             status: 'failed to get data',
             message: error
         })
     }
-    
+
 };
 
 // LEARN : how to use real database to create new tour
@@ -51,29 +51,60 @@ const createTour = async (req, res) => {
 };
 
 
-const getTour = (req, res) => {
-    
-    const id = Number(req.params.id);
-    const queryData = toursData.find(el => el.id === id);
-    res.status(200).json({
-        status: 'success',
-    });
+const getTour = async (req, res) => {
+    try {
+        const id = req.params.id;
+        console.log(id);
+        console.log(`objectId('${id}')`);
+        const queryData = await Tour.findById(id);
+        res.status(200).json({
+            status: 'success',
+            data: { tour: queryData }
+
+        });
+    } catch (error) {
+        res.status(404).json({
+            status: 'failed to get data',
+            message: error
+        })
+    }
+
 };
 
-const updateTour = (req, res) => {
-    const id = Number(req.params.id);
-    const tourIndex = toursData.findIndex(el => el.id === id);
-    res.status(200).json({
-        status: 'success',
-    });
+const updateTour = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const newUpdatedourData = await Tour.findByIdAndUpdate(id, req.body, { new: true, runValidators: true, strict: false });
+        res.status(200).json({
+            status: 'success',
+            data: {
+                Tour: newUpdatedourDatas
+            }
+        });
+    } catch (error) {
+        res.status(404).json({
+            status: 'failed to update data',
+            message: error
+        })
+    }
 };
 
-const deleteTour = (req, res) => {
-    const id = Number(req.params.id);
-    const tourIndex = toursData.findIndex(el => el.id === id);
-    res.status(204).json({
-        status: 'success',
-    });
+const deleteTour = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const tourDeletedData = Tour.findByIdAndDelete(id);
+        res.status(204).json({
+            status: 'success',
+            message: 'data deleted successfully',
+            data: null
+        });
+    } catch (error) {
+        res.status(404).json({
+            status: 'failed to delete data',
+            message: error
+        })
+    }
+
 };
 
 module.exports = { getAllTours, createTour, getTour, updateTour, deleteTour }
