@@ -6,8 +6,19 @@ const dataPath = path.join(__dirname, '../dev-data/data/tours-simple.json');
 // LEARN : how to get data from real database to get all tours
 const getAllTours = async (req, res) => {
     try {
-        const allTours = await Tour.find();
-        console.log(allTours);
+
+        // NOTE : BUILD QUERY
+        const queryObj = { ...req.query };
+        const excludedFields = ['page', 'sort', 'limit', 'fields'];
+        excludedFields.forEach(el => delete queryObj[el]);
+        const query =  Tour.find(
+            req.query
+        );
+        
+        // NOTE : EXECUTE QUERY
+        const allTours = await query;
+
+        // NOTE : SEND RESPONSE
         res.status(200).json({
             status: 'success',
             results: allTours.length,
@@ -50,12 +61,9 @@ const createTour = async (req, res) => {
 
 };
 
-
 const getTour = async (req, res) => {
     try {
         const id = req.params.id;
-        console.log(id);
-        console.log(`objectId('${id}')`);
         const queryData = await Tour.findById(id);
         res.status(200).json({
             status: 'success',
