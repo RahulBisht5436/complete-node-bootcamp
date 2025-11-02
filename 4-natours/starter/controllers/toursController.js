@@ -13,18 +13,18 @@ const getAllTours = async (req, res) => {
     try {
 
         // NOTE : BUILD QUERY
-        
-        
-        
+
+
+
 
         // NOTE : PAGINATION
-        
+
 
         //alasing : to provide a shortcut for frequently used query
-        
+
 
         // console.log(JSON.parse(appendedObject));    
-        
+
         // NOTE : EXECUTE QUERY
         const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate();
         const allTours = await features.query;
@@ -136,4 +136,6 @@ const deleteTour = async (req, res) => {
 
 };
 
-module.exports = { getAllTours, createTour, getTour, updateTour, deleteTour , alaisTopTours };
+
+
+module.exports = { getAllTours, createTour, getTour, updateTour, deleteTour, alaisTopTours };
