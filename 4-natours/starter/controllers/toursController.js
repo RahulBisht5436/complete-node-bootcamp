@@ -9,27 +9,21 @@ const getAllTours = async (req, res) => {
     try {
 
         // NOTE : BUILD QUERY
-        const queryObj = { ...req.query };
-        const excludedFields = ['page', 'sort', 'limit', 'fields'];
-        excludedFields.forEach(el => delete queryObj[el]);
-        let appendedObject = JSON.stringify(queryObj);
-        appendedObject = appendedObject.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-        const query =  Tour.find(
-            JSON.parse(appendedObject)
-        );
-        if (req.query.sort) {
-            const sortBy = req.query.sort.split(',').join(' ');
-            console.log(sortBy);    
-            query.sort(sortBy);
-        }
-        if (req.query.fields) {
-            const fields = req.query.fields.split(',').join(' ');
-            query.select(fields);
-        }
-        console.log(JSON.parse(appendedObject));
+        
+        
+        
+
+        // NOTE : PAGINATION
+        
+
+        //alasing : to provide a shortcut for frequently used query
+        
+
+        // console.log(JSON.parse(appendedObject));    
         
         // NOTE : EXECUTE QUERY
-        const allTours = await query;
+        const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate();
+        const allTours = await features.query;
 
         // NOTE : SEND RESPONSE
         res.status(200).json({
@@ -47,6 +41,62 @@ const getAllTours = async (req, res) => {
     }
 
 };
+
+class APIFeatures {
+    constructor(query, queryString) {
+        this.query = query;
+        this.queryString = queryString;
+    }
+
+    filter(){
+        console.log('filter function called successfully');
+        const queryObj = { ...this.queryString };
+        const excludedFields = ['page', 'sort', 'limit', 'fields'];
+        excludedFields.forEach(el => delete queryObj[el]);
+        let appendedObject = JSON.stringify(queryObj);
+        appendedObject = appendedObject.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+        this.query = this.query.find(JSON.parse(appendedObject));
+        return this;
+        // const query =  Tour.find(
+        //     JSON.parse(appendedObject)
+        // );
+    }
+
+    sort(){
+        console.log('sort function called successfully');
+        if (this.queryString.sort) {
+            const sortBy = this.queryString.sort.split(',').join(' ');
+            this.query = this.query.sort(sortBy);
+        }
+        return this;
+    }
+
+    limitFields(){
+        console.log('limitFields function called successfully');
+        if (this.queryString.fields) {
+            const fields = this.queryString.fields.split(',').join(' ');
+            this.query.select(fields);
+        }
+        return this;
+    }
+    paginate(){
+        console.log('paginate function called successfully');
+        const page = this.queryString.page * 1 || 1;
+        const limit = this.queryString.limit * 1 || 100;
+        const skip = (page - 1) * limit;
+        this.query.skip(skip).limit(limit);
+
+        return this;
+    }
+}
+
+
+const alaisTopTours = (req, res, next) => {
+    req.query.limit = '5';
+    req.query.sort = '-ratingsAverage,price';
+    req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+    next();
+}
 
 // LEARN : how to use real database to create new tour
 const createTour = async (req, res) => {
@@ -128,4 +178,4 @@ const deleteTour = async (req, res) => {
 
 };
 
-module.exports = { getAllTours, createTour, getTour, updateTour, deleteTour }
+module.exports = { getAllTours, createTour, getTour, updateTour, deleteTour , alaisTopTours };
