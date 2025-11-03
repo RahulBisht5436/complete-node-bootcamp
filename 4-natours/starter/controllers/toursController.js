@@ -2,6 +2,7 @@ const path = require('path');
 const Tour = require('../Models/tours');
 const { json } = require('express');
 const APIFeatures = require('../utils/apiFeatures');
+const { start } = require('repl');
 
 const dataPath = path.join(__dirname, '../dev-data/data/tours-simple.json');
 
@@ -107,7 +108,7 @@ const updateTour = async (req, res) => {
         res.status(200).json({
             status: 'success',
             data: {
-                Tour: newUpdatedourDatas
+                    Tour: newUpdatedourData
             }
         });
     } catch (error) {
@@ -136,6 +137,80 @@ const deleteTour = async (req, res) => {
 
 };
 
+const getTourStats = async (req, res) => {
 
+    try {
+        const stats = await Tour.aggregate(
+            [
+                {
+                    $match: { ratingAverage: { $gte: 4.5 } }
+                },
+                {
+                    $group: {
+                        _id: { $toUpper: '$difficulty' },
+                        numTours:{$sum:1},
+                        numsRatings: { $sum: '$ratingQuantity' },
+                        avgRating: { $avg: '$ratingAverage' },
+                        avgPrice: { $avg: '$price'},
+                        minPrice: { $min: '$price' },
+                        maxPrice: { $max: '$price' },    
+                    }
+                },
+                {
+                    $sort: { avgPrice: -1 }
+                }
+            ]
+        )
+        console.log(stats);
+        res.status(200).json({
+            status: 'success',
+            data: stats 
+        });
+    } catch (error) {
+        res.status(404).json({
+            status: 'failed to get aggregated  data',
+            message: error
+        })
+    }
 
-module.exports = { getAllTours, createTour, getTour, updateTour, deleteTour, alaisTopTours };
+}
+
+const getMonthlyPlan = async (req, res) => {
+    try {
+        const year = req.params.year * 1;
+        console.log(year);  
+        const monthlyPlanData = await Tour.aggregate([
+            { 
+                $unwind: '$startDates'
+            },{
+            $match:{
+                startDates: {
+                    $gte: new Date(`${year}-01-01`),
+                    $lte: new Date(`${year}-12-31`)
+                    }
+                }
+            },{
+                $group: {
+                    _id: { $month: '$startDates' },
+                    numTourStarts: { $sum: 1 },
+                    tours: { $push: '$name' }
+                }
+            },{
+                $addFields: { month: '$_id' }
+            },{
+                $project: { _id: 0 }
+            },{ $sort: { month: 1 } },
+            { $limit: 12 }
+        ])
+        res.status(200).json({
+            status: 'success',
+            data: monthlyPlanData
+        });
+    } catch (error) {
+        res.status(404).json({
+            status: 'not able to get monthly plan data',
+            message: error
+        })
+    }  
+}
+module.exports = { getMonthlyPlan , getAllTours, createTour, getTour, updateTour, deleteTour, alaisTopTours , getTourStats};
