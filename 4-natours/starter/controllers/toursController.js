@@ -13,20 +13,6 @@ const dataPath = path.join(__dirname, '../dev-data/data/tours-simple.json');
 const getAllTours = async (req, res) => {
     try {
 
-        // NOTE : BUILD QUERY
-
-
-
-
-        // NOTE : PAGINATION
-
-
-        //alasing : to provide a shortcut for frequently used query
-
-
-        // console.log(JSON.parse(appendedObject));    
-
-        // NOTE : EXECUTE QUERY
         const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate();
         const allTours = await features.query;
 
@@ -108,7 +94,7 @@ const updateTour = async (req, res) => {
         res.status(200).json({
             status: 'success',
             data: {
-                    Tour: newUpdatedourData
+                Tour: newUpdatedourData
             }
         });
     } catch (error) {
@@ -148,12 +134,12 @@ const getTourStats = async (req, res) => {
                 {
                     $group: {
                         _id: { $toUpper: '$difficulty' },
-                        numTours:{$sum:1},
+                        numTours: { $sum: 1 },
                         numsRatings: { $sum: '$ratingQuantity' },
                         avgRating: { $avg: '$ratingAverage' },
-                        avgPrice: { $avg: '$price'},
+                        avgPrice: { $avg: '$price' },
                         minPrice: { $min: '$price' },
-                        maxPrice: { $max: '$price' },    
+                        maxPrice: { $max: '$price' },
                     }
                 },
                 {
@@ -164,7 +150,7 @@ const getTourStats = async (req, res) => {
         console.log(stats);
         res.status(200).json({
             status: 'success',
-            data: stats 
+            data: stats
         });
     } catch (error) {
         res.status(404).json({
@@ -178,28 +164,28 @@ const getTourStats = async (req, res) => {
 const getMonthlyPlan = async (req, res) => {
     try {
         const year = req.params.year * 1;
-        console.log(year);  
+        console.log(year);
         const monthlyPlanData = await Tour.aggregate([
-            { 
+            {
                 $unwind: '$startDates'
-            },{
-            $match:{
-                startDates: {
-                    $gte: new Date(`${year}-01-01`),
-                    $lte: new Date(`${year}-12-31`)
+            }, {
+                $match: {
+                    startDates: {
+                        $gte: new Date(`${year}-01-01`),
+                        $lte: new Date(`${year}-12-31`)
                     }
                 }
-            },{
+            }, {
                 $group: {
                     _id: { $month: '$startDates' },
                     numTourStarts: { $sum: 1 },
                     tours: { $push: '$name' }
                 }
-            },{
+            }, {
                 $addFields: { month: '$_id' }
-            },{
+            }, {
                 $project: { _id: 0 }
-            },{ $sort: { month: 1 } },
+            }, { $sort: { month: 1 } },
             { $limit: 12 }
         ])
         res.status(200).json({
@@ -211,6 +197,6 @@ const getMonthlyPlan = async (req, res) => {
             status: 'not able to get monthly plan data',
             message: error
         })
-    }  
+    }
 }
-module.exports = { getMonthlyPlan , getAllTours, createTour, getTour, updateTour, deleteTour, alaisTopTours , getTourStats};
+module.exports = { getMonthlyPlan, getAllTours, createTour, getTour, updateTour, deleteTour, alaisTopTours, getTourStats };
