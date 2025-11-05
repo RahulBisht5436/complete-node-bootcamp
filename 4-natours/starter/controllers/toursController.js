@@ -1,15 +1,18 @@
 const path = require('path');
+const mongoose = require('mongoose');
 const Tour = require('../Models/tours');
 const { json } = require('express');
 const APIFeatures = require('../utils/apiFeatures');
+const AppError = require('../utils/appError');
 const { start } = require('repl');
 const catchAsync = require('../utils/catchAsync');
+const { appendFile } = require('fs');
 const dataPath = path.join(__dirname, '../dev-data/data/tours-simple.json');
 
 // let toursData = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 
 // LEARN : how to get data from real database to get all tours
-const getAllTours = catchAsync(async (req, res) => {
+const getAllTours = catchAsync(async (req, res, next) => {
     const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate();
     const allTours = await features.query;
     // NOTE : SEND RESPONSE
@@ -29,12 +32,7 @@ const alaisTopTours = catchAsync((req, res, next) => {
     next();
 });
 
-// LEARN : how to use real database to create new tour
-
-// Error Handling
-
-
-const createTour = catchAsync(async (req, res) => {
+const createTour = catchAsync(async (req, res, next) => {
     const newTour = await Tour.create(req.body);
     res.status(201).json({
         status: 'success',
@@ -42,21 +40,34 @@ const createTour = catchAsync(async (req, res) => {
     });
 });
 
-const getTour = catchAsync(async (req, res) => {
-
+const getTour = catchAsync(async (req, res, next) => {
+    console.log("inside the correct router getTour");
     const id = req.params.id;
+
+    // Check if ID is valid MongoDB ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return next(new AppError('Invalid ID format', 400));
+    }
+
     const queryData = await Tour.findById(id);
+    console.log("queryData:", queryData);
+
+    if (!queryData) {
+        return next(new AppError('No tour found with that ID', 404));
+    }
+
     res.status(200).json({
         status: 'success',
         data: { tour: queryData }
-
     });
-
 });
 
-const updateTour = catchAsync(async (req, res) => {
+const updateTour = catchAsync(async (req, res, next) => {
     const id = req.params.id;
     const newUpdatedourData = await Tour.findByIdAndUpdate(id, req.body, { new: true, runValidators: true, strict: false });
+    if (!newUpdatedourData) {
+        return next(new AppError('No tour found with that ID', 404));
+    }
     res.status(200).json({
         status: 'success',
         data: {
@@ -65,9 +76,12 @@ const updateTour = catchAsync(async (req, res) => {
     });
 });
 
-const deleteTour = catchAsync(async (req, res) => {
+const deleteTour = catchAsync(async (req, res, next) => {
     const id = req.params.id;
     const tourDeletedData = Tour.findByIdAndDelete(id);
+    if (!tourDeletedData) {
+        return next(new AppError('No tour found with that ID', 404));
+    }
     res.status(204).json({
         status: 'success',
         message: 'data deleted successfully',
@@ -75,7 +89,7 @@ const deleteTour = catchAsync(async (req, res) => {
     });
 });
 
-const getTourStats = catchAsync(async (req, res) => {
+const getTourStats = catchAsync(async (req, res, next) => {
 
     const stats = await Tour.aggregate(
         [
@@ -107,7 +121,7 @@ const getTourStats = catchAsync(async (req, res) => {
 
 });
 
-const getMonthlyPlan = catchAsync(async (req, res) => {
+const getMonthlyPlan = catchAsync(async (req, res, next) => {
     const year = req.params.year * 1;
     console.log(year);
     const monthlyPlanData = await Tour.aggregate([
