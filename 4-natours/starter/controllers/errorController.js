@@ -1,3 +1,21 @@
+const AppError = require('../utils/appError');
+const handleCastErrorDB = err => {
+    const message = `Invalid ${err.path}: ${err.value}.`;
+    return new AppError(message, 400);
+}
+const handleDuplicateFieldsDB = err => {
+    console.log("inside handleDuplicateFieldsDB");
+    // Newer Mongo/Mongoose provide keyValue with the duplicate field
+    let value = '';
+    if (err.keyValue) {
+        value = JSON.stringify(err.keyValue);
+    } else if (err.errmsg) {
+        const match = err.errmsg.match(/(["'])(\\?.)*?\1/);
+        value = match ? match[0] : '';
+    }
+    const message = `Duplicate field value: ${value}. Please use another value!`;
+    return new AppError(message, 400);
+}
 const sendErrorDev = (err, req, res) => {
     res.status(err.statusCode).json({
         status: err.status,
@@ -8,22 +26,45 @@ const sendErrorDev = (err, req, res) => {
 }
 
 const sendErrorProd = (err, req, res) => {
-    res.status(err.statusCode).json({
-        status: err.status,
-        message: err.message,
-    })
+    if (err.isOperational) {
+        res.status(err.statusCode).json({
+            status: err.status,
+            message: err.message,
+        })
+    } else {
+        console.error('ERROR 💥', err);
+        res.status(500).json({
+            status: 'error',
+            message: 'Something went very wrong!'
+        })
+    }
 }
 
 module.exports = (err, req, res, next) => {
-    err.status = err.statusCode || 500;
+    console.log(err.code, "==========================>>>>>>>>>>>>>>>>>>");
+
+    // Ensure we have proper statusCode and status
+    err.statusCode = err.statusCode || 500;
     err.status = err.status || 'error';
+
     if (process.env.NODE_ENV === 'development') {
         sendErrorDev(err, req, res);
-    } else if (process.env.NODE_ENV === 'production') {
-        sendErrorProd(err, req, res);
+        return;
     }
-    res.json({
-        status: err.status,
-        message: err.message
-    })
+
+    // production
+    let error = Object.assign({}, err);
+    // Copy important non-enumerable properties
+    error.message = err.message;
+    error.name = err.name;
+
+    if (error.name === 'CastError') {
+        error = handleCastErrorDB(error);
+    }
+
+    if (error.code === 11000) {
+        error = handleDuplicateFieldsDB(error);
+    }
+
+    sendErrorProd(error, req, res);
 } 
