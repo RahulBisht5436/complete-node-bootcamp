@@ -41,7 +41,6 @@ const createTour = catchAsync(async (req, res, next) => {
 });
 
 const getTour = catchAsync(async (req, res, next) => {
-    console.log("inside the correct router getTour");
     const id = req.params.id;
 
     // Check if ID is valid MongoDB ObjectId format

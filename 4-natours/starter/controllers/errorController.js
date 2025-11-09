@@ -9,7 +9,6 @@ const handleValidationErrorDB = err => {
     return new AppError(message, 400);
 }
 const handleDuplicateFieldsDB = err => {
-    console.log("inside handleDuplicateFieldsDB");
     // Newer Mongo/Mongoose provide keyValue with the duplicate field
     let value = '';
     if (err.keyValue) {

@@ -13,6 +13,8 @@ if(process.env.NODE_ENV === 'development'){
 }
 
 app.use(express.json());
+// parse application/x-www-form-urlencoded (for HTML form submissions / Postman form-data)
+app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
     req.requestTime = new Date().toISOString();
     next();

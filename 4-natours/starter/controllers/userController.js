@@ -1,9 +1,15 @@
-const getAllUsers = (req, res) => {
-    res.json({
-        status: 'failed',
-        message: 'End point not ready'
+const catchAsync = require('../utils/catchAsync');
+const User = require('./../Models/User');
+const getAllUsers = catchAsync(async function (req, res, next) {
+
+    const allUSers = await User.find()
+    res.status(200).json({
+        status: "success",
+        data: {
+            allUSers
+        }
     })
-}
+})
 const createUser = (req, res) => {
     res.json({
         status: 'failed',
@@ -29,4 +35,4 @@ const deleteUser = (req, res) => {
     })
 }
 
-module.exports ={deleteUser,createUser,updateUser,getAllUsers,getUser}
+module.exports = { deleteUser, createUser, updateUser, getAllUsers, getUser }
