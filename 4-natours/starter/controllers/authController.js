@@ -4,6 +4,12 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const AppError = require('./../utils/appError')
 
+const signinToken = async function(userId){
+     return await jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRE
+    })
+}
+
 const signup = catchAsync(async function signup(req, res, next) {
     // const newUser = await User.create(req.body);
     const newUser = await User.create({
@@ -13,9 +19,7 @@ const signup = catchAsync(async function signup(req, res, next) {
         password_confirmed: req.body.password_confirmed
     });
 
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE
-    })
+    const token = await signinToken(newUser._id)
 
     // send single response
     res.status(201).json({
@@ -40,18 +44,14 @@ const login = catchAsync(async function login(req, res, next) {
         email: email
     }).select('+password')
 
-    const passwordConfirmed = await bcrypt.compare(password, user.password)
-    let token;
-
-    if (passwordConfirmed) {
-        token = jwt.sign(
-            { id: user._id }, // better to include user ID, not password
-            process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRE }
-        );
-    } else {
-        return next(new AppError("Invalid email or password", 401));
+    console.log(await user.correctPassword(user.password, password))
+    if (!user || !(await user.correctPassword(user.password, password))) {
+        console.log("inside the else ahsdaudgiagdagdagdugdu")
+        return next(new AppError(" Incorrect mail or password ", 401))
     }
+
+    // if everthing is okay then send the token to the client
+    token = await signinToken(user._id)
     res.status(200).json(
         {
             status: "success",
