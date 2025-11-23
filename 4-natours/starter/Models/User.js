@@ -31,9 +31,20 @@ const userSchema = new mongoose.Schema({
             },
             message: "Password need to be same as entered password"
         }
+    },
+    passwordChangedTime: {
+        type: Date,
+        require: [true, " need the time of change"],
+
     }
 });
 
+
+userSchema.pre("save", async function (next) {
+    if (this.isModified("password")) {
+        this.passwordChangedTime = Date.now()
+    }
+})
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {
         next()
@@ -49,6 +60,14 @@ userSchema.methods.correctPassword = async function (candidatePassword, original
     // here we can't use this.password as we have hidded it from the normal querying
     return await bcrypt.compare(originalPassword, candidatePassword);
 }
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+    if (!this.passwordChangedTime) return false;
+    const changedTimestamp = parseInt(this.passwordChangedTime.getTime() / 1000, 10);
+    // If JWT was issued BEFORE password change => token invalid
+    return JWTTimestamp < changedTimestamp;
+};
+
 
 const User = mongoose.model('User', userSchema);
 

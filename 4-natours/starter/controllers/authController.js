@@ -1,9 +1,10 @@
-const {promisify} = require('util')
+const { promisify } = require('util')
 const User = require('./../Models/User');
 const catchAsync = require('../utils/catchAsync');
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
-const AppError = require('./../utils/appError')
+const AppError = require('./../utils/appError');
+const { decode } = require('punycode');
 
 const signinToken = async function (userId) {
     return await jwt.sign({ id: userId }, process.env.JWT_SECRET, {
@@ -46,7 +47,7 @@ const login = catchAsync(async function login(req, res, next) {
     }).select('+password')
 
     if (!user || !(await user.correctPassword(user.password, password))) {
-        
+
         return next(new AppError(" Incorrect mail or password ", 401))
     }
 
@@ -68,22 +69,29 @@ const protect = catchAsync(async function protect(req, res, next) {
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(" ")[1];
     }
-    console.log("==================>>>>>>>>>>>",token)
-    if(!token){
-        console.log("inside the error handling function")
+    if (!token) {
         return next(new AppError("You are not logged in , kindly login to get access ", 500))
     }
-    
+
     // 2) if there is token then validate , if it is require or not 
-    const decoded = await promisify( jwt.verify)(token,process.env.JWT_SECRET)
-    console.log(decoded)
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
+
     // 3) and also check after token verification that the user still exist or not
-    
+    // console.log(decode)
+    const freshUser = await User.findById(decoded.id)
+
+    if (!freshUser) {
+        return next(new AppError("User is deleted , kindly create a new user", 401))
+    }
+
     // 4) check if user changed password after the token is issued 
+    const changePassword = freshUser.changedPasswordAfter(decoded.iat)
+    if (changePassword) {
+        next(new AppError("Password Changed Afterword kindly initiate new session ", 401))
+    }
 
-
-
+    req.user = freshUser
     next()
 })
 
-module.exports = { signup, login, protect }
+module.exports = { signup, login, protect } 
