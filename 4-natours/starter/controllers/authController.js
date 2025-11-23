@@ -2,9 +2,7 @@ const { promisify } = require('util')
 const User = require('./../Models/User');
 const catchAsync = require('../utils/catchAsync');
 const jwt = require('jsonwebtoken')
-const bcrypt = require('bcryptjs')
 const AppError = require('./../utils/appError');
-const { decode } = require('punycode');
 
 const signinToken = async function (userId) {
     return await jwt.sign({ id: userId }, process.env.JWT_SECRET, {
@@ -94,4 +92,25 @@ const protect = catchAsync(async function protect(req, res, next) {
     next()
 })
 
-module.exports = { signup, login, protect } 
+
+// this is a middleware factory function style
+const restrictTo = (...roles) => {
+    return catchAsync(async (req, res, next) => {
+        let token;
+        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            token = req.headers.authorization.split(" ")[1];
+        }
+        if (!token) {
+            return next(new AppError("You are not logged in , kindly login to get access ", 500))
+        }
+        let decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
+        console.log(decoded.id, "this is decoded id")
+        let userId = decoded.id
+        let user = await User.findById(userId)
+        if (!roles.includes(user.role)) {
+            next(new AppError("user doest have valid authority , login with other account ", 401))
+        }
+        next()
+    })
+}
+module.exports = { signup, login, protect, restrictTo } 

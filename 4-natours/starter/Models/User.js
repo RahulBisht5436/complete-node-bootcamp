@@ -8,6 +8,12 @@ const userSchema = new mongoose.Schema({
         trim: true,
         maxlength: [20, "Name cannot exceed 20 characters"]
     },
+    role:{
+        type: String,
+        enum:['user','guide','lead-guide','admin'],
+        default:'user',
+        require:[true , "need to specify the role"]
+    },
     email: {
         type: String,
         required: [true, "Email is required"],

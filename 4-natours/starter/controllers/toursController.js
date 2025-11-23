@@ -76,7 +76,9 @@ const updateTour = catchAsync(async (req, res, next) => {
 
 const deleteTour = catchAsync(async (req, res, next) => {
     const id = req.params.id;
-    const tourDeletedData = Tour.findByIdAndDelete(id);
+    console.log(id,"deletetioniid")
+    const tourDeletedData = await Tour.findByIdAndDelete(id);
+    console.log(tourDeletedData)
     if (!tourDeletedData) {
         return next(new AppError('No tour found with that ID', 404));
     }
