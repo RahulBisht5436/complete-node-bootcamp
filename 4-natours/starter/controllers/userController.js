@@ -1,3 +1,4 @@
+const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const User = require('./../Models/User');
 const getAllUsers = catchAsync(async function (req, res, next) {
@@ -35,4 +36,21 @@ const deleteUser = (req, res) => {
     })
 }
 
-module.exports = { deleteUser, createUser, updateUser, getAllUsers, getUser }
+const forgotPassword = catchAsync(async function forgotPassword(req, res, next) {
+    const user = await User.findOne({ email: req.body.email })
+    if (!user) {
+        return next(new AppError("User email is wrong , kindly enter the correct mail", 404))
+    }
+    const tempPassword = await user.createResetPasswordToken();
+    await user.save({ validateBeforeSave: false }); // this skips the validation process 
+
+    return res.status(200).json({
+        "message": "akhsiaus"
+    })
+})
+
+const resetPassword = catchAsync(async function resetPassword(req, res, next) {
+
+    retrun
+})
+module.exports = { deleteUser, createUser, updateUser, getAllUsers, getUser, forgotPassword, resetPassword }
