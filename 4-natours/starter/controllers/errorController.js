@@ -3,7 +3,7 @@ const handleCastErrorDB = err => {
     const message = `Invalid ${err.path}: ${err.value}.`;
     return new AppError(message, 400);
 }
-const JsonWebTokenError = err => new AppError(err,404)
+const JsonWebTokenError = err => new AppError(err, 401)
 const handleValidationErrorDB = err => {
     const errors = Object.values(err.errors).map(el => el.message);
     const message = `Invalid input data. ${errors.join('. ')}`;
