@@ -1,11 +1,12 @@
+const {promisify} = require('util')
 const User = require('./../Models/User');
 const catchAsync = require('../utils/catchAsync');
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const AppError = require('./../utils/appError')
 
-const signinToken = async function(userId){
-     return await jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+const signinToken = async function (userId) {
+    return await jwt.sign({ id: userId }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRE
     })
 }
@@ -44,9 +45,8 @@ const login = catchAsync(async function login(req, res, next) {
         email: email
     }).select('+password')
 
-    console.log(await user.correctPassword(user.password, password))
     if (!user || !(await user.correctPassword(user.password, password))) {
-        console.log("inside the else ahsdaudgiagdagdagdugdu")
+        
         return next(new AppError(" Incorrect mail or password ", 401))
     }
 
@@ -62,5 +62,28 @@ const login = catchAsync(async function login(req, res, next) {
     )
 })
 
+const protect = catchAsync(async function protect(req, res, next) {
+    // 1) First check if there is token or not \
+    let token;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(" ")[1];
+    }
+    console.log("==================>>>>>>>>>>>",token)
+    if(!token){
+        console.log("inside the error handling function")
+        return next(new AppError("You are not logged in , kindly login to get access ", 500))
+    }
+    
+    // 2) if there is token then validate , if it is require or not 
+    const decoded = await promisify( jwt.verify)(token,process.env.JWT_SECRET)
+    console.log(decoded)
+    // 3) and also check after token verification that the user still exist or not
+    
+    // 4) check if user changed password after the token is issued 
 
-module.exports = { signup, login }
+
+
+    next()
+})
+
+module.exports = { signup, login, protect }

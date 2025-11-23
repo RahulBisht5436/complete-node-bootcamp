@@ -83,7 +83,6 @@ const tourSchema = new mongoose.Schema({
 // DOCUMENT MIDDLEWARE : runs before .save() and .create()
 tourSchema.pre('save', function (next) {
     this.slug = slugify(this.name, { lower: true });
-    console.log(this);
     next();
 })
 
@@ -93,13 +92,13 @@ tourSchema.pre(/^find/, function (next) {
 })
 
 tourSchema.post(/^find/, function (docs, next) {
-    console.log(docs);
+    // console.log(docs);
     next();
 })
 
 tourSchema.pre('aggregate', function (next) {
     this.pipeline().unshift({ $match: { secreteTours: { $ne: true } } });
-    console.log(this.pipeline());
+    // console.log(this.pipeline());
     next()
 })
 
@@ -107,7 +106,7 @@ tourSchema.virtual('durationWeeks').get(function () {
     return this.duration / 7;
 })
 tourSchema.post('save', function (doc, next) {
-    console.log('document saved successfully');
+    // console.log('document saved successfully');
     next();
 })
 const Tour = mongoose.model('Tour', tourSchema);

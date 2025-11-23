@@ -8,7 +8,7 @@ const userRouter = require('./routes/userRoutes');
 const tourRouter = require('./routes/tourRoutes');
 app.use(express.static(`${__dirname}/public`))
 
-if(process.env.NODE_ENV === 'development'){
+if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'))
 }
 
@@ -20,15 +20,12 @@ app.use((req, res, next) => {
     next();
 });
 
-
 app.use('/api/v1/tours', tourRouter)
 app.use('/api/v1/users', userRouter);
 
 app.all('*', (req, res, next) => {
-    
+
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 })
-
-
 app.use(globalErrorHandler);
 module.exports = app

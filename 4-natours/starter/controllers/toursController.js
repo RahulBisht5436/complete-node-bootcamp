@@ -49,7 +49,6 @@ const getTour = catchAsync(async (req, res, next) => {
     }
 
     const queryData = await Tour.findById(id);
-    console.log("queryData:", queryData);
 
     if (!queryData) {
         return next(new AppError('No tour found with that ID', 404));
@@ -111,7 +110,6 @@ const getTourStats = catchAsync(async (req, res, next) => {
             }
         ]
     )
-    console.log(stats);
     res.status(200).json({
         status: 'success',
         data: stats

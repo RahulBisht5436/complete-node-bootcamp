@@ -3,6 +3,7 @@ const handleCastErrorDB = err => {
     const message = `Invalid ${err.path}: ${err.value}.`;
     return new AppError(message, 400);
 }
+const JsonWebTokenError = err => new AppError(err,404)
 const handleValidationErrorDB = err => {
     const errors = Object.values(err.errors).map(el => el.message);
     const message = `Invalid input data. ${errors.join('. ')}`;
@@ -70,6 +71,9 @@ module.exports = (err, req, res, next) => {
     }
     if (error.name === 'ValidationError') {
         error = handleValidationErrorDB(error);
+    }
+    if (error.name === "JsonWebTokenError") {
+        handleJWTError(error)
     }
 
     sendErrorProd(error, req, res);
