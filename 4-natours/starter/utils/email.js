@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer')
-const { options } = require('superagent')
 
 
 
