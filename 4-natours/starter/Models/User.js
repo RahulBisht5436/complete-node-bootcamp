@@ -49,6 +49,12 @@ const userSchema = new mongoose.Schema({
     passwordResetExpires: Date
 });
 
+userSchema.pre("save", function(next){
+    if(!this.isModified("password") || this.isNew() ) return next();
+    this.passwordChangedTime = Date.now() - 1000;
+    next()
+})
+
 userSchema.pre("save", async function (next) {
     if (this.isModified("password")) {
         this.passwordChangedTime = Date.now()
@@ -65,6 +71,8 @@ userSchema.pre("save", async function (next) {
 })
 
 // INSTANCE METHOD
+
+
 userSchema.methods.correctPassword = async function (candidatePassword, originalPassword) {
     // here we can't use this.password as we have hidded it from the normal querying
     return await bcrypt.compare(originalPassword, candidatePassword);
