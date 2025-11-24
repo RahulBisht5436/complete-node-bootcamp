@@ -45,7 +45,7 @@ const forgotPassword = catchAsync(async function forgotPassword(req, res, next) 
     await user.save({ validateBeforeSave: false }); // this skips the validation process 
 
     return res.status(200).json({
-        "message": "akhsiaus"
+        "message": "temp password set kindly check the mail"
     })
 })
 

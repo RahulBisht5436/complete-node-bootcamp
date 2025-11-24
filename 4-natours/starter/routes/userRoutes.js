@@ -1,7 +1,7 @@
 const express = require('express')
-const { deleteUser, createUser, updateUser, getAllUsers, getUser, forgotPassword,resetPassword} = require('../controllers/userController')
-const { signup , login } = require("./../controllers/authController")
-
+const { deleteUser, createUser, updateUser, getAllUsers, getUser, forgotPassword, resetPassword } = require('../controllers/userController')
+const { signup, login } = require("./../controllers/authController")
+const { sendMail } = require("./../utils/email")
 // NOTE : Users Resource
 const userRouter = express.Router() // this defines the way router will behave
 
