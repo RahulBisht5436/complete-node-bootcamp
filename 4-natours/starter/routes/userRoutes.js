@@ -10,6 +10,6 @@ userRouter.route('/:id').get(getUser).patch(updateUser).delete(deleteUser)
 userRouter.route('/signup').post(signup)
 userRouter.route('/login').post(login)
 userRouter.route('/forgotpassword').post(forgotPassword)
-userRouter.route('/resetpassword').post(resetPassword)
+userRouter.route('/resetpassword/:token').patch(resetPassword)
 
 module.exports = userRouter

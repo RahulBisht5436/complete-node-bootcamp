@@ -1,32 +1,30 @@
-const nodemailer = require('nodemailer')
+const nodemailer = require('nodemailer');
+const catchAsync = require('./catchAsync');
 
+const sendEmail = async (options) => {
 
+    console.log("akushiagsid")
 
-const  sendEmail = async options =>{
-    const transporter = nodemailer.createTransport(
-        {
-            host:process.env.EMAIL_HOST ,
-            port: process.env.EMAIL_PORT ,
-            service:'gmail',
-            auth:{
-                user:process.env.ADMIN_EMAIL,
-                pass:process.env.ADMIN_PASSWORD
-            },
-
-        }
-    )
-
-
-
-    const sendOptions = {
-        from:"rahulbisht <rahulbisht7982669162@gmail.com>",
-        to: options.email,
-        subject:options.subbject,
-        text:options.text
+  const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: Number(process.env.EMAIL_PORT),
+    auth: {
+      user: process.env.ADMIN_EMAIL,
+      pass: process.env.ADMIN_PASSWORD
     }
+  });
 
-    await transporter.sendMail(sendOptions)
+  const mailOptions = {
+    from: "Rahul Bisht <rahulbisht7982669162@gmail.com>",
+    to: options.email,
+    subject: options.subject,
+    text: options.text
+  };
 
-}
+  return  await transporter.sendMail(mailOptions);
+};
 
-module.exports ={ sendEmail}
+// const sendEmailTest = catchAsync( async function sendEmailTest(){
+//     coso
+// } )
+module.exports = { sendEmail };
