@@ -92,6 +92,39 @@ const protect = catchAsync(async function protect(req, res, next) {
     next()
 })
 
+const updatePassword = catchAsync( async function updatePassword(req,res,next) {
+    console.log("--------------->>>")
+        let token;
+        console.log(req.headers.authorization,"authorization header data")
+        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            token = req.headers.authorization.split(" ")[1];
+        }
+        if (!token) {
+            return next(new AppError("You are not logged in , kindly login to get access ", 500))
+        }
+
+
+        console.log(token,"=======JWT token")
+        let decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
+        let userId = decoded.id
+
+        user = await User.findById(userId)
+        if(!req.body.newpassword || !req.body.newpasswordconfirmed){
+            return next(new AppError("passord and confirmed password is needed"),401)
+        }
+        
+        user.password = req.body.newpassword
+        user.password_confirmed = req.body.newpasswordconfirmed
+        user.passwordResetToken = undefined
+        user.passwordResetExpires = undefined
+
+        await user.save()
+        return res.status(200).json({
+            status:"successful",
+            message:"password is updated successfully",
+            token
+        })
+})
 
 // this is a middleware factory function style
 const restrictTo = (...roles) => {
@@ -104,7 +137,6 @@ const restrictTo = (...roles) => {
             return next(new AppError("You are not logged in , kindly login to get access ", 500))
         }
         let decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
-        console.log(decoded.id, "this is decoded id")
         let userId = decoded.id
         let user = await User.findById(userId)
         if (!roles.includes(user.role)) {
@@ -113,4 +145,4 @@ const restrictTo = (...roles) => {
         next()
     })
 }
-module.exports = { signup, login, protect, restrictTo } 
+module.exports = { signup, login, protect, restrictTo ,updatePassword } 

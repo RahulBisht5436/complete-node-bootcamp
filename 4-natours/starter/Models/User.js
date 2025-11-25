@@ -10,11 +10,11 @@ const userSchema = new mongoose.Schema({
         trim: true,
         maxlength: [20, "Name cannot exceed 20 characters"]
     },
-    role:{
+    role: {
         type: String,
-        enum:['user','guide','lead-guide','admin'],
-        default:'user',
-        require:[true , "need to specify the role"]
+        enum: ['user', 'guide', 'lead-guide', 'admin'],
+        default: 'user',
+        require: [true, "need to specify the role"]
     },
     email: {
         type: String,
@@ -45,12 +45,12 @@ const userSchema = new mongoose.Schema({
         require: [true, " need the time of change"],
 
     },
-    passwordResetToken : String,
+    passwordResetToken: String,
     passwordResetExpires: Date
 });
 
-userSchema.pre("save", function(next){
-    if(!this.isModified("password") || this.isNew() ) return next();
+userSchema.pre("save", function (next) {
+    if (!this.isModified("password") || this.isNew) return next();
     this.passwordChangedTime = Date.now() - 1000;
     next()
 })
@@ -85,14 +85,14 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
     return JWTTimestamp < changedTimestamp;
 };
 
-userSchema.methods.createResetPasswordToken = function(){
+userSchema.methods.createResetPasswordToken = function () {
     const resetToken = crypto.randomBytes(32).toString("hex");
     const crypData = crypto.createHash('sha256').update(resetToken).digest("hex");
-    this.passwordResetToken=  crypData;
-    console.log(resetToken , crypData)
-    this.passwordResetExpires = Date.now() + 10*60*1000;
+    this.passwordResetToken = crypData;
+    console.log(resetToken, crypData)
+    this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
     return resetToken
-    
+
 }
 
 const User = mongoose.model('User', userSchema);
