@@ -12,8 +12,6 @@ const signinToken = async function (userId) {
 }
 
 const signup = catchAsync(async function signup(req, res, next) {
-    // const newUser = await User.create(req.body);
-    console.log(req.body.password,"===============>>>>")
     const newUser = await User.create({
         name: req.body.name,
         email: req.body.email,
@@ -59,7 +57,6 @@ const protect = catchAsync(async function protect(req, res, next) {
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
 
     // 3) and also check after token verification that the user still exist or not
-    // console.log(decode)
     const freshUser = await User.findById(decoded.id)
 
     if (!freshUser) {
@@ -114,7 +111,6 @@ const updatePassword = catchAsync(async function updatePassword(req, res, next) 
 
     // 4. Fetch user with password explicitly selected
     const user = await User.findById(userId).select("+password");
-    console.log(user.id,"this is user idq")
     if (!user) {
         return next(new AppError("User not found", 404));
     }
@@ -124,7 +120,6 @@ const updatePassword = catchAsync(async function updatePassword(req, res, next) 
     if (!newpassword || !newpasswordconfirmed) {
         return next(new AppError("New password and confirm password are required", 401));
     }
-    console.log(newpassword,"===============>>>>")
     if (!user.correctPassword(newpassword, user.password)) {
         return next(new AppError("Enter Password and Confirmed Password Do not match"), 401)
     }
@@ -154,8 +149,6 @@ const updatePassword = catchAsync(async function updatePassword(req, res, next) 
 });
 
 const updateMe = catchAsync( async function updateMe(req,res,next) {
-    console.log("correct API hit ")
-    console.log(req.body.name,req.body.email,request.body.role,"=======user update data=========")
     return res.status(200).json(
         {
             status:'success',
