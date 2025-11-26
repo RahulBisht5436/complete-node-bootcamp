@@ -46,10 +46,10 @@ const deleteUser = (req, res) => {
     })
 }
 
-const forgotPassword = catchAsync(async function(req, res, next){
+const forgotPassword = catchAsync(async function (req, res, next) {
     const user = await User.findOne({ email: req.body.email });
 
-    if(!user){
+    if (!user) {
         return next(new AppError("User email is wrong, kindly enter correct email", 404));
     }
 
@@ -72,7 +72,7 @@ const forgotPassword = catchAsync(async function(req, res, next){
             message: "Reset link sent to email"
         });
 
-    } catch(err) {
+    } catch (err) {
         user.passwordResetToken = undefined;
         user.passwordResetExpires = undefined;
         await user.save({ validateBeforeSave: false });

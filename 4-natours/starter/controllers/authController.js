@@ -34,7 +34,7 @@ const login = catchAsync(async function login(req, res, next) {
         email: email
     }).select('+password')
 
-    if (!user || !(await user.correctPassword(password,user.password))) {
+    if (!user || !(await user.correctPassword(password, user.password))) {
 
         return next(new AppError(" Incorrect mail or password ", 401))
     }
@@ -148,11 +148,11 @@ const updatePassword = catchAsync(async function updatePassword(req, res, next) 
     sendToken(user, 200, res)
 });
 
-const updateMe = catchAsync( async function updateMe(req,res,next) {
+const updateMe = catchAsync(async function updateMe(req, res, next) {
     return res.status(200).json(
         {
-            status:'success',
-            data:{
+            status: 'success',
+            data: {
 
             }
         }
@@ -179,4 +179,4 @@ const restrictTo = (...roles) => {
         next()
     })
 }
-module.exports = { signup, login, protect, restrictTo, updatePassword,updateMe } 
+module.exports = { signup, login, protect, restrictTo, updatePassword, updateMe } 
