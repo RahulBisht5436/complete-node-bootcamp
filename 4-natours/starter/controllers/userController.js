@@ -88,6 +88,7 @@ const resetPassword = catchAsync(async function (req, res, next) {
     if (!user) {
         return next(new AppError("user is not found or token expired"), 401)
     }
+    console.log(req.body.newpassword, "send password=====<<<<" )
     user.password = req.body.newpassword
     user.password_confirmed = req.body.newpasswordconfirmed
     user.passwordResetToken = undefined

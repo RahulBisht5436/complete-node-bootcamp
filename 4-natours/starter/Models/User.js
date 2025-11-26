@@ -75,7 +75,7 @@ userSchema.pre("save", async function (next) {
 
 userSchema.methods.correctPassword = async function (candidatePassword, originalPassword) {
     // here we can't use this.password as we have hidded it from the normal querying
-    return await bcrypt.compare(originalPassword, candidatePassword);
+    return await bcrypt.compare(candidatePassword,originalPassword);
 }
 
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {

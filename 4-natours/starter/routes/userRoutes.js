@@ -1,7 +1,6 @@
 const express = require('express')
 const { deleteUser, createUser, updateUser, getAllUsers, getUser, forgotPassword, resetPassword } = require('../controllers/userController')
-const { updatePassword,signup, login } = require("./../controllers/authController")
-const { sendMail } = require("./../utils/email")
+const { updatePassword,signup, login,protect ,updateMe} = require("./../controllers/authController")
 // NOTE : Users Resource
 const userRouter = express.Router() // this defines the way router will behave
 
@@ -9,8 +8,8 @@ userRouter.post('/signup', signup);
 userRouter.post('/login', login);
 userRouter.post('/forgotpassword', forgotPassword);
 userRouter.patch('/resetpassword/:token', resetPassword);
-userRouter.patch('/updatepassword', updatePassword);
-
+userRouter.patch('/updatepassword',protect ,updatePassword);
+userRouter.post('/updateme',protect,updateMe)
 userRouter.route('/')
   .get(getAllUsers)
   .post(createUser);
