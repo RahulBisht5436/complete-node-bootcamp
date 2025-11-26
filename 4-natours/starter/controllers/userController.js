@@ -46,37 +46,41 @@ const deleteUser = (req, res) => {
     })
 }
 
-const forgotPassword = catchAsync(async function forgotPassword(req, res, next) {
-    const user = await User.findOne({ email: req.body.email })
-    if (!user) {
-        return next(new AppError("User email is wrong , kindly enter the correct mail", 404))
+const forgotPassword = catchAsync(async function(req, res, next){
+    const user = await User.findOne({ email: req.body.email });
+
+    if(!user){
+        return next(new AppError("User email is wrong, kindly enter correct email", 404));
     }
-    const tempPassword = await user.createResetPasswordToken();
-    await user.save({ validateBeforeSave: false }); // this skips the validation process 
 
-    const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${tempPassword}`
-    const resetMessage = `If you forget your password then submit new passowrd in the url : ${resetURL} , you haven't kindly ignore this email`
+    const resetToken = user.createResetPasswordToken();
+    await user.save({ validateBeforeSave: false });
 
-    console.log("Script is Excuted till here", user.email)
+    const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${resetToken}`;
+
+    const resetMessage = `Forgot your password? Submit new password using this link:\n\n${resetURL}\n\nIf you didn't request this, please ignore.`;
+
     try {
         await sendEmail({
             email: user.email,
-            subject: "data is only valid upto 10 mins",
+            subject: "Password reset valid for 10 minutes",
             text: resetMessage
+        });
 
-        })
-        return res.status(200).json({
-            "message": "temp password set kindly check the mail"
-        })
+        res.status(200).json({
+            status: "success",
+            message: "Reset link sent to email"
+        });
 
-    } catch (error) {
-        user.createResetPasswordToken = undefined
-        user.passwordResetExpires = undefined
-        user.save({ validateBeforeSave: false })
-        return next(new AppError("Error in Sending the Email"), 500)
+    } catch(err) {
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save({ validateBeforeSave: false });
+
+        return next(new AppError("Error sending email", 500));
     }
+});
 
-})
 
 const resetPassword = catchAsync(async function (req, res, next) {
     const hashedToken = crypto.createHash("sha256").update(req.params.token).digest("hex")

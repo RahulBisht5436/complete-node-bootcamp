@@ -13,6 +13,7 @@ const signinToken = async function (userId) {
 
 const signup = catchAsync(async function signup(req, res, next) {
     // const newUser = await User.create(req.body);
+    console.log(req.body.password,"===============>>>>")
     const newUser = await User.create({
         name: req.body.name,
         email: req.body.email,
@@ -35,7 +36,7 @@ const login = catchAsync(async function login(req, res, next) {
         email: email
     }).select('+password')
 
-    if (!user || !(await user.correctPassword(user.password, password))) {
+    if (!user || !(await user.correctPassword(password,user.password))) {
 
         return next(new AppError(" Incorrect mail or password ", 401))
     }
@@ -92,6 +93,7 @@ const updatePassword = catchAsync(async function updatePassword(req, res, next) 
 
     // 1. Validate original password input
     const originPassword = req.body.originpassword;
+
     if (!originPassword) {
         return next(new AppError("Original password is required", 401));
     }
@@ -112,7 +114,7 @@ const updatePassword = catchAsync(async function updatePassword(req, res, next) 
 
     // 4. Fetch user with password explicitly selected
     const user = await User.findById(userId).select("+password");
-
+    console.log(user.id,"this is user idq")
     if (!user) {
         return next(new AppError("User not found", 404));
     }
@@ -122,6 +124,7 @@ const updatePassword = catchAsync(async function updatePassword(req, res, next) 
     if (!newpassword || !newpasswordconfirmed) {
         return next(new AppError("New password and confirm password are required", 401));
     }
+    console.log(newpassword,"===============>>>>")
     if (!user.correctPassword(newpassword, user.password)) {
         return next(new AppError("Enter Password and Confirmed Password Do not match"), 401)
     }
