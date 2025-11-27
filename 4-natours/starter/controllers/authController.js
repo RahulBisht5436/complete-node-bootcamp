@@ -150,24 +150,24 @@ const updatePassword = catchAsync(async function updatePassword(req, res, next) 
 
 const updateMe = catchAsync(async function updateMe(req, res, next) {
     const user = req.user
-    if(!user){
-        return next( new AppError("Can't identify user credential , kindly login again"),401)
+    if (!user) {
+        return next(new AppError("Can't identify user credential , kindly login again"), 401)
     }
-    const {name ,email ,role} = req.body
-    console.log(name, email , role ,"this is the send data by user")
-    data = await User.findByIdAndUpdate(user.id,{
+    const { name, email, role } = req.body
+    console.log(name, email, role, "this is the send data by user")
+    data = await User.findByIdAndUpdate(user.id, {
         name,
         email,
-    },{
+    }, {
         new: true,
-        runValidators:true
+        runValidators: true
     }
-)
+    )
     return res.status(200).json(
         {
             status: 'success',
             data: {
-
+                    data
             }
         }
     )
