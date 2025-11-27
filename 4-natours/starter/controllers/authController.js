@@ -198,7 +198,7 @@ const deleteUser = catchAsync(async function deleteUser(req, res, next) {
     if (!req.user) {
         return next(new AppError("No User Found"), 401)
     }
-    const user = User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user.id,
         {
             active: req.body.active
@@ -210,7 +210,9 @@ const deleteUser = catchAsync(async function deleteUser(req, res, next) {
     )
     res.status(200).json({
         status: "success",
-        data: null
+        data: {
+            user
+        }
     })
 }
 
