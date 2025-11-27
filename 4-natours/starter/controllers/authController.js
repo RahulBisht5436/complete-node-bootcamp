@@ -195,26 +195,23 @@ const restrictTo = (...roles) => {
 }
 
 const deleteUser = catchAsync(async function deleteUser(req, res, next) {
-    console.log("user data======>>>>",req.user)
-    if(!req.user){
-        return next(new AppError("No User Found"),401)
+    if (!req.user) {
+        return next(new AppError("No User Found"), 401)
     }
-   const user = User.findByIdAndUpdate(
-    req.user.id,
-    {
-        active : req.body.active
-    },
-    {
-        new:true,
-        runValidators:true
-    }
-   )
-   res.status(200).json({
-    status:"success",
-    data:{
-        user
-    }
-   })
+    const user = User.findByIdAndUpdate(
+        req.user.id,
+        {
+            active: req.body.active
+        },
+        {
+            new: true,
+            runValidators: true
+        }
+    )
+    res.status(200).json({
+        status: "success",
+        data: null
+    })
 }
 
 )
