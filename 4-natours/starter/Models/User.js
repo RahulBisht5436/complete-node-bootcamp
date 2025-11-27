@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require("bcryptjs")
-const crypto = require("crypto")
+const crypto = require("crypto");
+const { type } = require('os');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -46,7 +47,11 @@ const userSchema = new mongoose.Schema({
 
     },
     passwordResetToken: String,
-    passwordResetExpires: Date
+    passwordResetExpires: Date,
+    active:{
+        type:Boolean,
+        default:true
+    }
 });
 
 userSchema.pre("save", function (next) {

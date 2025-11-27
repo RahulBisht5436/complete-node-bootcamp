@@ -167,7 +167,7 @@ const updateMe = catchAsync(async function updateMe(req, res, next) {
         {
             status: 'success',
             data: {
-                    data
+                data
             }
         }
     )
@@ -193,4 +193,29 @@ const restrictTo = (...roles) => {
         next()
     })
 }
-module.exports = { signup, login, protect, restrictTo, updatePassword, updateMe } 
+
+const deleteUser = catchAsync(async function deleteUser(req, res, next) {
+    console.log("user data======>>>>",req.user)
+    if(!req.user){
+        return next(new AppError("No User Found"),401)
+    }
+   const user = User.findByIdAndUpdate(
+    req.user.id,
+    {
+        active : req.body.active
+    },
+    {
+        new:true,
+        runValidators:true
+    }
+   )
+   res.status(200).json({
+    status:"success",
+    data:{
+        user
+    }
+   })
+}
+
+)
+module.exports = { signup, login, protect, restrictTo, updatePassword, updateMe, deleteUser } 
