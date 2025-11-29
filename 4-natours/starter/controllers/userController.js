@@ -12,12 +12,11 @@ const signinToken = async function (userId) {
 }
 
 const getAllUsers = catchAsync(async function (req, res, next) {
-
-    const allUSers = await User.find()
+    const allUsers = await User.find()
     res.status(200).json({
         status: "success",
         data: {
-            allUSers
+            allUsers
         }
     })
 })
