@@ -9,7 +9,7 @@ const helmet = require('helmet');                    // Security headers
 const mongoSanitize = require('express-mongo-sanitize'); // Prevent NoSQL injection
 const xss = require('xss-clean');                   // Prevent XSS attacks
 const rateLimiter = require('express-rate-limit');  // Prevent brute-force attacks
-
+const hpp = require('hpp')                          // use to handle the parameter pollution
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./utils/appError');
 
@@ -42,6 +42,11 @@ if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
 
+app.use(hpp({
+    whitelist:[
+        'duration'
+    ]
+}))
 
 // 4) Rate Limiting (Protect from brute-force & API abuse)
 // Allows max 100 requests per IP per hour for routes starting with /api
