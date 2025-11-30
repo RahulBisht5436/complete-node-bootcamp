@@ -1,15 +1,17 @@
 const catchAsync = require('../utils/catchAsync');
 const Review = require('../Models/reviews');
 const AppError = require('../utils/appError');
-const getAllReviews = catchAsync( async (req, res, next) => {
+
+
+const getAllReviews = catchAsync(async (req, res, next) => {
     const reviews = await Review.find();
-    if(!reviews){
-        return next( new AppError('No reviews found',404));
+    if (!reviews) {
+        return next(new AppError('No reviews found', 404));
     }
     res.status(200).json({
         status: 'success',
         message: 'Reviews fetched successfully',
-        data:{
+        data: {
             reviews
         }
     });
@@ -35,4 +37,4 @@ const createReview = catchAsync(async (req, res, next) => {
     });
 });
 
-module.exports= { getAllReviews ,createReview }
+module.exports = { getAllReviews, createReview }
