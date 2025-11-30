@@ -57,8 +57,15 @@ const reviewSchema = new mongoose.Schema(
 // --------------------------------------
 // MODEL CREATION
 // --------------------------------------
-const Review = mongoose.model('Review', reviewSchema);
 
+reviewSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: 'user',
+    })
+    next();
+})
+
+const Review = mongoose.model('Review', reviewSchema);
 // --------------------------------------
 // EXPORT
 // --------------------------------------
