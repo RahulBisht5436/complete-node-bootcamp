@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const validator = require('validator');
+
 const tourSchema = new mongoose.Schema({
     name: {
         type: String,
+        required: [true, 'A tour must have a name'],
         unique: true,
         trim: true,
-        maxlength: [40, 'A tour name must have less or equal then 40 characters'],
-        minlength: [10, 'A tour name must have more or equal then 10 characters'],
-        required: [true, 'A tour must have a name']
+        maxlength: [40, 'Name ≤ 40 chars'],
+        minlength: [10, 'Name ≥ 10 chars']
     },
     secreteTours: {
         type: Boolean,
@@ -21,22 +21,19 @@ const tourSchema = new mongoose.Schema({
     },
     maxGroupSize: {
         type: Number,
-        required: [true, 'A tour must have a group size']
+        required: [true, 'A tour must have group size']
     },
     difficulty: {
         type: String,
-        required: [true, 'A tour must have a difficulty'],
-        enum: {
-            values: ['easy', 'medium', 'difficult'],
-            message: 'Difficulty is either: easy, medium, difficult'
-        }
+        required: true,
+        enum: ['easy', 'medium', 'difficult']
     },
     ratingAverage: {
         type: Number,
         default: 4.5,
-        min: [1, 'Rating must be above 1.0'],
-        max: [5, 'Rating must be below 5.0'],
-        set: val => Math.round(val * 10) / 10 // 4.6666, 46.666, 47, 4.7
+        min: 1,
+        max: 5,
+        set: val => Math.round(val * 10) / 10
     },
     ratingQuantity: {
         type: Number,
@@ -44,22 +41,21 @@ const tourSchema = new mongoose.Schema({
     },
     price: {
         type: Number,
-        required: [true, 'A tour must have a price']
+        required: true
     },
     priceDiscount: {
         type: Number,
         validate: {
             validator: function (val) {
-                // this only points to current doc on NEW document creation
                 return val < this.price;
             },
-            message: 'Discount price ({VALUE}) should be below regular price'
+            message: "Discount must be less than price"
         }
     },
     summary: {
         type: String,
-        required: [true, 'A tour must have a summary'],
         trim: true,
+        required: true
     },
     description: {
         type: String,
@@ -67,49 +63,67 @@ const tourSchema = new mongoose.Schema({
     },
     imageCover: {
         type: String,
-        required: [true, 'A tour must have a cover image']
+        required: true
     },
     images: [String],
     createdAt: {
         type: Date,
-        default: Date.now(),
+        default: Date.now()
     },
-    startDates: [Date]
+    startDates: [Date],
+
+    // Geospatial fields
+    startLocation: {
+        type: {
+            type: String,
+            default: 'Point',
+            enum: ['Point']
+        },
+        coordinates: [Number],
+        address: String,
+        description: String
+    },
+
+    locations: [
+        {
+            type: {
+                type: String,
+                default: 'Point',
+                enum: ['Point']
+            },
+            coordinates: [Number],
+            address: String,
+            description: String,
+            day: Number
+        }
+    ],
+
+    // GUIDES -> REFERENCING
+    guides: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'User'
+        }
+    ]
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
-}
-)
-// DOCUMENT MIDDLEWARE : runs before .save() and .create()
+});
+
+// CREATE SLUG
 tourSchema.pre('save', function (next) {
     this.slug = slugify(this.name, { lower: true });
     next();
-})
-
-tourSchema.pre(/^find/, function (next) {
-    this.find({ secreteTours: { $ne: true } });
-    next()
-})
-
-tourSchema.post(/^find/, function (docs, next) {
-    // console.log(docs);
-    next();
-})
-
+});
+// AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function (next) {
     this.pipeline().unshift({ $match: { secreteTours: { $ne: true } } });
-    // console.log(this.pipeline());
-    next()
-})
+    next();
+});
 
+// VIRTUAL FIELD
 tourSchema.virtual('durationWeeks').get(function () {
     return this.duration / 7;
-})
-tourSchema.post('save', function (doc, next) {
-    // console.log('document saved successfully');
-    next();
-})
-const Tour = mongoose.model('Tour', tourSchema);
-module.exports = Tour;
+});
 
-
+module.exports = mongoose.model('Tour', tourSchema);

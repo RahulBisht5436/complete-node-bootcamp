@@ -1,19 +1,15 @@
 const path = require('path');
 const mongoose = require('mongoose');
 const Tour = require('../Models/tours');
-const { json } = require('express');
 const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
-const { start } = require('repl');
 const catchAsync = require('../utils/catchAsync');
-const { appendFile } = require('fs');
-const dataPath = path.join(__dirname, '../dev-data/data/tours-simple.json');
 
 // let toursData = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 
 // LEARN : how to get data from real database to get all tours
 const getAllTours = catchAsync(async (req, res, next) => {
-    const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate();
+    const features = new APIFeatures(Tour.find().populate('guides'), req.query).filter().sort().limitFields().paginate();
     const allTours = await features.query;
     // NOTE : SEND RESPONSE
     res.status(200).json({
@@ -48,7 +44,10 @@ const getTour = catchAsync(async (req, res, next) => {
         return next(new AppError('Invalid ID format', 400));
     }
 
-    const queryData = await Tour.findById(id);
+    const queryData = await Tour.findById(id).populate({
+        path: 'reviews',
+        select: '-__v -passwordChangedTime'
+    });
 
     if (!queryData) {
         return next(new AppError('No tour found with that ID', 404));
