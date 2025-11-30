@@ -63,7 +63,6 @@ userSchema.pre("save", function (next) {
 
 userSchema.pre(/^find/, function (next) {
     // this point to current querry\
-    console.log("find end point hit")
     this.find({ active: { $ne: false } })
     next()
 })

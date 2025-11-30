@@ -9,7 +9,7 @@ const catchAsync = require('../utils/catchAsync');
 
 // LEARN : how to get data from real database to get all tours
 const getAllTours = catchAsync(async (req, res, next) => {
-    const features = new APIFeatures(Tour.find().populate('guides'), req.query).filter().sort().limitFields().paginate();
+    const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate();
     const allTours = await features.query;
     // NOTE : SEND RESPONSE
     res.status(200).json({
@@ -44,10 +44,7 @@ const getTour = catchAsync(async (req, res, next) => {
         return next(new AppError('Invalid ID format', 400));
     }
 
-    const queryData = await Tour.findById(id).populate({
-        path: 'reviews',
-        select: '-__v -passwordChangedTime'
-    });
+    const queryData = await Tour.findById(id);
 
     if (!queryData) {
         return next(new AppError('No tour found with that ID', 404));
@@ -75,7 +72,7 @@ const updateTour = catchAsync(async (req, res, next) => {
 
 const deleteTour = catchAsync(async (req, res, next) => {
     const id = req.params.id;
-    console.log(id,"deletetioniid")
+    console.log(id, "deletetioniid")
     const tourDeletedData = await Tour.findByIdAndDelete(id);
     console.log(tourDeletedData)
     if (!tourDeletedData) {
