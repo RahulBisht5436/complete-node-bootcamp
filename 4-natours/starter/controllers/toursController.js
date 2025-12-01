@@ -7,9 +7,6 @@ const mongoose = require('mongoose');
 // Tour model
 const Tour = require('../Models/tours');
 
-// Utility for filtering, sorting, limiting fields, pagination
-const APIFeatures = require('../utils/apiFeatures');
-
 // Custom AppError class
 const AppError = require('../utils/appError');
 
@@ -17,7 +14,7 @@ const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 // Factory delete and update handler (hard delete and update)
-const { deleteOne , updateOne , createOne , findOne } = require('./handlerFactory');
+const { deleteOne, updateOne, createOne, findOne, findAll } = require('./handlerFactory');
 
 
 
@@ -25,29 +22,7 @@ const { deleteOne , updateOne , createOne , findOne } = require('./handlerFactor
 // GET ALL TOURS
 // Supports filtering, sorting, limiting fields, and pagination
 // ------------------------------------------------------------
-const getAllTours = catchAsync(async (req, res, next) => {
-
-    // Apply query transformations using APIFeatures class
-    const features = new APIFeatures(Tour.find(), req.query)
-        .filter()
-        .sort()
-        .limitFields()
-        .paginate();
-
-    // Execute the constructed query
-    const allTours = await features.query;
-
-    // Send response
-    res.status(200).json({
-        status: 'success',
-        results: allTours.length,
-        data: {
-            tours: allTours
-        }
-    });
-});
-
-
+const getAllTours = findAll(Tour);
 
 // ------------------------------------------------------------
 // ALIAS MIDDLEWARE

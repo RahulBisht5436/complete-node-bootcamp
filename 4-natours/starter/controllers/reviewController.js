@@ -8,7 +8,7 @@ const Review = require('../Models/reviews');
 const AppError = require('../utils/appError');
 
 // Reusable delete factory function
-const { deleteOne, updateOne, createOne } = require('./handlerFactory');
+const { deleteOne, updateOne, createOne, findOne, findAll } = require('./handlerFactory');
 
 
 
@@ -41,29 +41,7 @@ const getAllReviews = catchAsync(async (req, res, next) => {
 // Get ALL reviews for a specific tour
 // Route: GET /api/v1/tours/:tourId/reviews
 // ------------------------------------------------------------
-const getTourAllReviews = catchAsync(async (req, res, next) => {
-
-    // Extract tour ID from URL params
-    console.log(req.params.tourId);
-
-    // Find reviews linked to this tour
-    const reviews = await Review.find({ tour: req.params.tourId });
-
-    // If none found
-    if (!reviews) {
-        return next(new AppError('No reviews found for this tour', 404));
-    }
-
-    console.log(reviews.length);
-
-    // Successful response
-    return res.status(200).json({
-        status: 'success',
-        message: 'Tour reviews fetched successfully',
-        reviews
-    });
-});
-
+const getTourAllReviews = findAll(Review);
 
 const updateReview = updateOne(Review);
 
@@ -102,6 +80,11 @@ const createReview = createOne(Review);
 const deleteReview = deleteOne(Review);
 
 
+// ------------------------------------------------------------
+// Get Review (Uses factory findOne)
+// ------------------------------------------------------------
+const getReview = findOne(Review);
+
 
 // Export controllers
 module.exports = {
@@ -110,5 +93,6 @@ module.exports = {
     createReviewPreHandler,
     getTourAllReviews,
     deleteReview,
-    updateReview
+    updateReview,
+    getReview
 };

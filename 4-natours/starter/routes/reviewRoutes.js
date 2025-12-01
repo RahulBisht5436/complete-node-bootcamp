@@ -2,13 +2,14 @@
 const express = require('express');
 
 // Import review controller functions
-const { 
-    getAllReviews, 
-    createReview, 
-    getTourAllReviews, 
+const {
+    getAllReviews,
+    createReview,
+    getTourAllReviews,
     deleteReview,
     createReviewPreHandler,
-    updateReview 
+    updateReview,
+    getReview
 } = require('../controllers/reviewController');
 
 // Import authentication & authorization middleware
@@ -56,6 +57,7 @@ reviewRouter
 // ------------------------------------------------------------
 reviewRouter
     .route('/:id')
+    .get(getReview)                           // Get a single review by ID
     .patch(
         protect,
         restrictTo('user'),

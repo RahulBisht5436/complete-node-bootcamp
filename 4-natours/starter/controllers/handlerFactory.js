@@ -4,6 +4,9 @@ const catchAsync = require('./../utils/catchAsync');
 // Import custom AppError for operational errors
 const AppError = require('./../utils/appError');
 
+// importing the APIFeatures class for query handling (if needed)
+// Utility for filtering, sorting, limiting fields, pagination
+const APIFeatures = require('../utils/apiFeatures');
 
 // --------------------------------------------------------------
 // Factory Function: deleteOne
@@ -83,11 +86,11 @@ const createOne = Model =>
 const findOne = (Model, populateOptions) =>
     catchAsync(async (req, res, next) => {
         let query = Model.findById(req.params.id);
-        if(Array.isArray(populateOptions)){
+        if (Array.isArray(populateOptions)) {
             populateOptions.forEach(option => {
                 query = query.populate(option);
             })
-        }else{
+        } else {
             query = query.populate(populateOptions);
         }
 
@@ -109,7 +112,29 @@ const findOne = (Model, populateOptions) =>
     });
 
 
+const findAll = Model => catchAsync(async (req, res, next) => {
+
+    // Apply query transformations using APIFeatures class
+    const features = new APIFeatures(Model.find(), req.query)
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate();
+
+    // Execute the constructed query
+    const doc = await features.query;
+
+    // Send response
+    res.status(200).json({
+        status: 'success',
+        results: doc.length,
+        data: {
+            data: doc
+        }
+    });
+});
+
 // --------------------------------------------------------------
 // EXPORT FACTORY FUNCTIONS
 // --------------------------------------------------------------
-module.exports = { deleteOne, updateOne, createOne, findOne };
+module.exports = { deleteOne, updateOne, createOne, findOne, findAll };
