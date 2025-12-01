@@ -50,6 +50,7 @@ const protect = catchAsync(async function protect(req, res, next) {
         token = req.headers.authorization.split(" ")[1];
     }
     if (!token) {
+        console.log("no token found")
         return next(new AppError("You are not logged in , kindly login to get access ", 500))
     }
 

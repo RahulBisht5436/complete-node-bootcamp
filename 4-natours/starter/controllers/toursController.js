@@ -4,6 +4,7 @@ const Tour = require('../Models/tours');
 const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const { deleteOne } = require('./handlerFactory');
 
 // let toursData = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 
@@ -70,20 +71,9 @@ const updateTour = catchAsync(async (req, res, next) => {
     });
 });
 
-const deleteTour = catchAsync(async (req, res, next) => {
-    const id = req.params.id;
-    console.log(id, "deletetioniid")
-    const tourDeletedData = await Tour.findByIdAndDelete(id);
-    console.log(tourDeletedData)
-    if (!tourDeletedData) {
-        return next(new AppError('No tour found with that ID', 404));
-    }
-    res.status(204).json({
-        status: 'success',
-        message: 'data deleted successfully',
-        data: null
-    });
-});
+
+const deleteTour = deleteOne(Tour);
+
 
 const getTourStats = catchAsync(async (req, res, next) => {
 
