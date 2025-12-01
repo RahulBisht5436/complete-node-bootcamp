@@ -17,6 +17,20 @@ const getAllReviews = catchAsync(async (req, res, next) => {
     });
 });
 
+const getTourAllReviews = catchAsync(async (req, res, next) => {
+    console.log(req.params.tourId);
+    const reviews = await Review.find({ tour: req.params.tourId });
+    if (!reviews) {
+        return next(new AppError('No reviews found for this tour', 404));
+    }
+    console.log(reviews.length);
+    return res.status(200).json({
+        status: 'success',
+        message: 'Tour reviews fetched successfully',
+        reviews
+
+    })
+})
 
 
 
@@ -45,4 +59,4 @@ const createReview = catchAsync(async (req, res, next) => {
     });
 });
 
-module.exports = { getAllReviews, createReview }
+module.exports = { getAllReviews, createReview, getTourAllReviews }
