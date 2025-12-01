@@ -132,7 +132,7 @@ tourSchema.pre(/^find/, function (next) {
 // VIRTUAL POPULATE
 tourSchema.virtual('reviews',{
     ref:'Review',
-    foreignField:'tour',s
+    foreignField:'tour',
     localField:'_id'
 })
 
