@@ -16,16 +16,24 @@ const getAllReviews = catchAsync(async (req, res, next) => {
         }
     });
 });
+
+
+
+
 const createReview = catchAsync(async (req, res, next) => {
-    const { review, rating, tour, user } = req.body;
-    if (!review || !rating || !tour || !user) {
+    if (!req.body.tourID) req.body.tourID = req.params.tourId;
+    if (!req.body.user) req.body.user = req.user.id;
+    const userID = req.body.user; // Assuming protect middleware adds user to req
+    const tourID = req.body.tourID;
+    const { review, rating } = req.body;
+    if (!review || !rating || !tourID || !userID) {
         return next(new AppError('Please provide review, rating, tour, and user', 400));
     }
     const newReview = await Review.create({
         review,
         rating,
-        tour,
-        user
+        tour: tourID,
+        user: userID
     });
 
     return res.status(201).json({
