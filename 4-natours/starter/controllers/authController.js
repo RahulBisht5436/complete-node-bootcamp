@@ -96,7 +96,7 @@ const protect = catchAsync(async function protect(req, res, next) {
     if (changePassword) {
         return next(new AppError("Password Changed Afterword kindly initiate new session ", 401));
     }
-
+    console.log("Protected route accessed by user:", freshUser.id);
     // Grant access to protected route
     req.user = freshUser;
     next();

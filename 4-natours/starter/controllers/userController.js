@@ -46,6 +46,23 @@ const updateUser = updateOne(User);
 
 const deleteUser = deleteOne(User);
 
+// ---------------------------------------------
+// CONTROLLER: OWN DATA
+// Allows user to get infromation about their own account
+// ---------------------------------------------
+
+const getMe = catchAsync(async function (req, res, next) {
+    if(!req.user){
+        return next(new AppError("User not found", 404));
+    }
+    res.status(200).json({
+        status: "success",
+        data: {
+            user_data: req.user
+        }
+    });
+    next()
+})
 
 
 // ---------------------------------------------
@@ -155,5 +172,6 @@ module.exports = {
     getAllUsers,
     getUser,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    getMe
 };

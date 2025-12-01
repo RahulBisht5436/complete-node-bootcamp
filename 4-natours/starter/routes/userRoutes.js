@@ -6,7 +6,8 @@ const {
     createUser, 
     updateUser, 
     getAllUsers, 
-    getUser, 
+    getUser,
+    getMe, 
     forgotPassword, 
     resetPassword 
 } = require('../controllers/userController');
@@ -50,6 +51,8 @@ userRouter.patch('/updatepassword', protect, updatePassword);
 // Update user profile (name/email only)
 userRouter.post('/updateme', protect, updateMe);
 
+// Give user profile Information
+userRouter.get('/getMe', protect, getMe);
 
 
 // ------------------------------------------------------------
