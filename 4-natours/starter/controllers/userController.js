@@ -5,7 +5,7 @@ const catchAsync = require('../utils/catchAsync');       // Wrapper to catch asy
 const jwt = require("jsonwebtoken");                     // JWT library for token generation
 const crypto = require('crypto');                        // Node crypto for hashing reset token
 const User = require('./../Models/User');                // User model
-const { deleteOne } = require('./handlerFactory');       // Factory function (not used directly here)
+const { deleteOne, updateOne } = require('./handlerFactory');       // Factory function (not used directly here)
 
 
 
@@ -57,12 +57,7 @@ const getUser = (req, res) => {
     });
 };
 
-const updateUser = (req, res) => {
-    res.json({
-        status: 'failed',
-        message: 'End point not ready'
-    });
-};
+const updateUser = updateOne(User);
 
 const deleteUser = deleteOne(User);
 

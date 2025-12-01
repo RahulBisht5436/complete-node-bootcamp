@@ -8,7 +8,7 @@ const Review = require('../Models/reviews');
 const AppError = require('../utils/appError');
 
 // Reusable delete factory function
-const { deleteOne } = require('./handlerFactory');
+const { deleteOne, updateOne, createOne } = require('./handlerFactory');
 
 
 
@@ -65,47 +65,33 @@ const getTourAllReviews = catchAsync(async (req, res, next) => {
 });
 
 
+const updateReview = updateOne(Review);
+
+
 
 // ------------------------------------------------------------
 // Create a new review
 // Auto-assigns user & tour from protect() and nested routes
 // ------------------------------------------------------------
-const createReview = catchAsync(async (req, res, next) => {
 
+
+
+// code for the create review pre-handler middleware
+const createReviewPreHandler = catchAsync(async (req, res, next) => {
     // Auto-fill tourID from URL if not provided in body
-    if (!req.body.tourID) req.body.tourID = req.params.tourId;
-
+    if (!req.body.tourID) req.body.tour = req.params.tourId;
     // Auto-fill user ID from protect middleware
     if (!req.body.user) req.body.user = req.user.id;
 
-    const userID = req.body.user;
-    const tourID = req.body.tourID;
+    console.log(req.body)
+    next();
 
-    // Extract required fields
-    const { review, rating } = req.body;
-
-    // Validate all required fields exist
-    if (!review || !rating || !tourID || !userID) {
-        return next(new AppError('Please provide review, rating, tour, and user', 400));
-    }
-
-    // Create review document in DB
-    const newReview = await Review.create({
-        review,
-        rating,
-        tour: tourID,
-        user: userID
-    });
-
-    // Send success response
-    return res.status(201).json({
-        status: 'success',
-        message: 'Review created successfully',
-        data: {
-            review: newReview
-        }
-    });
 });
+
+
+// Create Review controller using factory function
+const createReview = createOne(Review);
+
 
 
 
@@ -118,9 +104,11 @@ const deleteReview = deleteOne(Review);
 
 
 // Export controllers
-module.exports = { 
-    getAllReviews, 
-    createReview, 
-    getTourAllReviews, 
-    deleteReview 
+module.exports = {
+    getAllReviews,
+    createReview,
+    createReviewPreHandler,
+    getTourAllReviews,
+    deleteReview,
+    updateReview
 };

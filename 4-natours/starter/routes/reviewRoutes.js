@@ -6,7 +6,9 @@ const {
     getAllReviews, 
     createReview, 
     getTourAllReviews, 
-    deleteReview 
+    deleteReview,
+    createReviewPreHandler,
+    updateReview 
 } = require('../controllers/reviewController');
 
 // Import authentication & authorization middleware
@@ -30,7 +32,8 @@ reviewRouter
     .get(getAllReviews)                       // Fetch all reviews
     .post(
         protect,                              // User must be logged in
-        restrictTo('user'),                   // Only normal users can create reviews
+        restrictTo('user'),
+        createReviewPreHandler,               // Pre-handler to auto-fill tour and user IDs
         createReview
     );
 
@@ -53,6 +56,11 @@ reviewRouter
 // ------------------------------------------------------------
 reviewRouter
     .route('/:id')
+    .patch(
+        protect,
+        restrictTo('user'),
+        updateReview
+    )                          // Must be authenticated
     .delete(
         protect,                              // Must be authenticated
         restrictTo('user', 'admin'),          // Only user or admin roles may delete reviews

@@ -16,8 +16,8 @@ const AppError = require('../utils/appError');
 // Async error wrapper
 const catchAsync = require('../utils/catchAsync');
 
-// Factory delete handler (hard delete)
-const { deleteOne } = require('./handlerFactory');
+// Factory delete and update handler (hard delete and update)
+const { deleteOne , updateOne , createOne } = require('./handlerFactory');
 
 
 
@@ -70,15 +70,7 @@ const alaisTopTours = catchAsync((req, res, next) => {
 // ------------------------------------------------------------
 // CREATE A NEW TOUR
 // ------------------------------------------------------------
-const createTour = catchAsync(async (req, res, next) => {
-
-    const newTour = await Tour.create(req.body);
-
-    res.status(201).json({
-        status: 'success',
-        data: newTour
-    });
-});
+const createTour = createOne(Tour);
 
 
 
@@ -116,31 +108,7 @@ const getTour = catchAsync(async (req, res, next) => {
 // ------------------------------------------------------------
 // UPDATE TOUR (by ID)
 // ------------------------------------------------------------
-const updateTour = catchAsync(async (req, res, next) => {
-
-    const id = req.params.id;
-
-    // Update tour with new data
-    const newUpdatedourData = await Tour.findByIdAndUpdate(
-        id,
-        req.body,
-        { new: true, runValidators: true, strict: false }
-    );
-
-    // If tour not found
-    if (!newUpdatedourData) {
-        return next(new AppError('No tour found with that ID', 404));
-    }
-
-    // Successful response
-    res.status(200).json({
-        status: 'success',
-        data: {
-            Tour: newUpdatedourData
-        }
-    });
-});
-
+const updateTour = updateOne(Tour);
 
 
 // ------------------------------------------------------------
