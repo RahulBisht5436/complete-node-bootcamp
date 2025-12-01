@@ -129,6 +129,13 @@ tourSchema.pre(/^find/, function (next) {
     next();
 })
 
+// VIRTUAL POPULATE
+tourSchema.virtual('reviews',{
+    ref:'Review',
+    foreignField:'tour',s
+    localField:'_id'
+})
+
 // VIRTUAL FIELD
 tourSchema.virtual('durationWeeks').get(function () {
     return this.duration / 7;

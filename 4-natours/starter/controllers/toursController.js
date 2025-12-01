@@ -44,7 +44,7 @@ const getTour = catchAsync(async (req, res, next) => {
         return next(new AppError('Invalid ID format', 400));
     }
 
-    const queryData = await Tour.findById(id);
+    const queryData = await Tour.findById(id).populate('reviews');
 
     if (!queryData) {
         return next(new AppError('No tour found with that ID', 404));
