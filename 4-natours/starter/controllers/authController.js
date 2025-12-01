@@ -279,6 +279,8 @@ const restrictTo = (...roles) => {
 // ----------------------------------------------------
 // DELETE USER (Soft delete → mark active status)
 // ----------------------------------------------------
+
+// here we cant use the deleteOne factory function because we need to update the 'active' field instead of deleting the user document.
 const deleteUser = catchAsync(async function deleteUser(req, res, next) {
 
     // Must be logged in via protect()

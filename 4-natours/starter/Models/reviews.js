@@ -3,44 +3,46 @@
 // --------------------------------------
 const mongoose = require('mongoose');
 
+
 // --------------------------------------
 // REVIEW SCHEMA
 // --------------------------------------
-// This schema stores all reviews given by users for tours.
-// Each review is linked to: 
-//    - A Tour (tour field)
-//    - A User (user field)
-// We also prevent empty reviews and enforce rating boundaries.
+// Schema that defines how reviews are stored in MongoDB.
+// Each review is connected to:
+//   - a Tour (tour field)
+//   - a User (user field)
+// Also includes validation rules for text and rating.
+// --------------------------------------
 const reviewSchema = new mongoose.Schema(
     {
-        // Review text
+        // Review text content
         review: {
             type: String,
             required: [true, "Review cannot be empty"],
             trim: true
         },
 
-        // Rating between 1 and 5
+        // Rating provided by user (1–5)
         rating: {
             type: Number,
             min: 1,
             max: 5
         },
 
-        // Auto-set review creation timestamp
+        // Automatically set date of creation
         createdAt: {
             type: Date,
             default: Date.now
         },
 
-        // The tour this review belongs to
+        // Reference to the Tour that this review belongs to
         tour: {
             type: mongoose.Schema.ObjectId,
             ref: 'Tour',
             required: [true, "Review must belong to a tour"]
         },
 
-        // The user who wrote the review
+        // Reference to the User who wrote the review
         user: {
             type: mongoose.Schema.ObjectId,
             ref: 'User',
@@ -48,25 +50,32 @@ const reviewSchema = new mongoose.Schema(
         }
     },
     {
-        // Enable virtual fields when converting to JSON or Object
+        // Include virtuals whenever converting review to JSON or object
         toJSON: { virtuals: true },
         toObject: { virtuals: true }
     }
 );
 
-// --------------------------------------
-// MODEL CREATION
-// --------------------------------------
 
+// --------------------------------------
+// POPULATION MIDDLEWARE
+// --------------------------------------
+// Automatically populate the "user" field whenever a find query runs.
+// Ensures API responses show user details without manually calling populate()
+// --------------------------------------
 reviewSchema.pre(/^find/, function (next) {
-    this.populate({ path: 'user' });
+    this.populate({ path: 'user' });  // Populate only user info
     next();
 });
 
 
-
-const Review = mongoose.model('Review', reviewSchema);
 // --------------------------------------
-// EXPORT
+// MODEL CREATION
+// --------------------------------------
+const Review = mongoose.model('Review', reviewSchema);
+
+
+// --------------------------------------
+// EXPORT MODEL
 // --------------------------------------
 module.exports = Review;

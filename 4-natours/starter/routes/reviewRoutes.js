@@ -1,13 +1,65 @@
+// Express router
 const express = require('express');
-const { getAllReviews, createReview, getTourAllReviews , deleteReview } = require('../controllers/reviewController');
+
+// Import review controller functions
+const { 
+    getAllReviews, 
+    createReview, 
+    getTourAllReviews, 
+    deleteReview 
+} = require('../controllers/reviewController');
+
+// Import authentication & authorization middleware
 const { protect, restrictTo } = require('../controllers/authController');
-// mergeParams to access params from parent router
+
+// ------------------------------------------------------------
+// Create Router
+// mergeParams: true → allows access to params from parent router
+// Example: /tours/:tourId/reviews
+// ------------------------------------------------------------
 const reviewRouter = express.Router({ mergeParams: true });
 
 
-reviewRouter.route('/').get(getAllReviews).post(protect, restrictTo('user'), createReview);
-reviewRouter.route('/getTourAllReviews').get(getTourAllReviews);
-reviewRouter.route('/:id').delete(protect , restrictTo('user', 'admin'), deleteReview);
+
+// ------------------------------------------------------------
+// ROUTE: GET /  → Get all reviews
+// ROUTE: POST / → Create review (Only authenticated 'user' role)
+// ------------------------------------------------------------
+reviewRouter
+    .route('/')
+    .get(getAllReviews)                       // Fetch all reviews
+    .post(
+        protect,                              // User must be logged in
+        restrictTo('user'),                   // Only normal users can create reviews
+        createReview
+    );
 
 
+
+// ------------------------------------------------------------
+// ROUTE: GET /getTourAllReviews
+// Fetch all reviews for a specific tour (tourId from parent route)
+// ------------------------------------------------------------
+reviewRouter
+    .route('/getTourAllReviews')
+    .get(getTourAllReviews);
+
+
+
+// ------------------------------------------------------------
+// ROUTE: DELETE /:id
+// Delete a review → Only logged-in user/admin allowed
+// Uses factory deleteOne
+// ------------------------------------------------------------
+reviewRouter
+    .route('/:id')
+    .delete(
+        protect,                              // Must be authenticated
+        restrictTo('user', 'admin'),          // Only user or admin roles may delete reviews
+        deleteReview
+    );
+
+
+
+// Export the router for use in app.js
 module.exports = reviewRouter;
