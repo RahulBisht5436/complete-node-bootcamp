@@ -17,7 +17,7 @@ const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 // Factory delete and update handler (hard delete and update)
-const { deleteOne , updateOne , createOne } = require('./handlerFactory');
+const { deleteOne , updateOne , createOne , findOne } = require('./handlerFactory');
 
 
 
@@ -79,31 +79,7 @@ const createTour = createOne(Tour);
 //
 // Includes ID validation and review population
 // ------------------------------------------------------------
-const getTour = catchAsync(async (req, res, next) => {
-
-    const id = req.params.id;
-
-    // Validate MongoDB ObjectId format
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return next(new AppError('Invalid ID format', 400));
-    }
-
-    // Find tour and populate its "reviews" virtual field
-    const queryData = await Tour.findById(id).populate('reviews');
-
-    // If not found
-    if (!queryData) {
-        return next(new AppError('No tour found with that ID', 404));
-    }
-
-    // Successful response
-    res.status(200).json({
-        status: 'success',
-        data: { tour: queryData }
-    });
-});
-
-
+const getTour = findOne(Tour, { path: 'reviews' });
 
 // ------------------------------------------------------------
 // UPDATE TOUR (by ID)
