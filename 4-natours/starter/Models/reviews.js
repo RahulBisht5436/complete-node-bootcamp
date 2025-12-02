@@ -58,6 +58,7 @@ const reviewSchema = new mongoose.Schema(
     }
 );
 
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true }); // One review per user per tour
 
 // --------------------------------------
 // STATIC METHOD: CALCULATE AVG RATINGS
@@ -97,19 +98,20 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
 reviewSchema.post('save', async function () {
     // 'this' is the newly created review document
     const stats = await this.constructor.calcAverageRatings(this.tour);
+    if (stats.length !== 0) {
+        // Update Tour with the new aggregated stats
+        const UpdatedTour = await Tour.findByIdAndUpdate(
+            this.tour,
+            {
+                ratingQuantity: stats[0].nRating,
+                ratingAverage: stats[0].avgRAting
+            },
+            { new: true }
+        );
 
-    // Update Tour with the new aggregated stats
-    const UpdatedTour = await Tour.findByIdAndUpdate(
-        this.tour,
-        {
-            ratingQuantity: stats[0].nRating,
-            ratingAverage: stats[0].avgRAting
-        },
-        { new: true }
-    );
-
-    if (!UpdatedTour) {
-        console.log("Tour not found while updating ratings");
+        if (!UpdatedTour) {
+            console.log("Tour not found while updating ratings");
+        }
     }
 });
 
