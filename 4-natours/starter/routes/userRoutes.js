@@ -2,25 +2,25 @@
 const express = require('express');
 
 // Import user-related controller functions (not auth)
-const { 
-    createUser, 
-    updateUser, 
-    getAllUsers, 
-    getUser,
-    getMe, 
-    forgotPassword, 
-    resetPassword 
+const {
+  createUser,
+  updateUser,
+  getAllUsers,
+  getUser,
+  getMe,
+  forgotPassword,
+  resetPassword
 } = require('../controllers/userController');
 
 // Import authentication & authorization controllers
-const { 
-    deleteUser, 
-    updatePassword, 
-    signup, 
-    login, 
-    protect, 
-    updateMe, 
-    restrictTo 
+const {
+  deleteUser,
+  updatePassword,
+  signup,
+  login,
+  protect,
+  updateMe,
+  restrictTo
 } = require("./../controllers/authController");
 
 // ------------------------------------------------------------
@@ -37,13 +37,13 @@ userRouter.post('/signup', signup);                 // Create user account
 userRouter.post('/login', login);                   // Login and get token
 
 // Delete logged-in user's account (soft delete)
-userRouter.delete('/deleteUser', protect, deleteUser);
+userRouter.delete('/deleteUser', protect, restrictTo('user'), deleteUser);
 
 // Forgot password → sends reset token email
 userRouter.post('/forgotpassword', forgotPassword);
 
 // Reset password using token from email
-userRouter.patch('/resetpassword/:token', resetPassword);
+userRouter.patch('/resetpassword/:token', protect, resetPassword);
 
 // Update password (logged-in user only)
 userRouter.patch('/updatepassword', protect, updatePassword);
@@ -54,6 +54,8 @@ userRouter.post('/updateme', protect, updateMe);
 // Give user profile Information
 userRouter.get('/getMe', protect, getMe);
 
+
+userRouter.use(restrictTo('admin')); // All routes after this are admin-only
 
 // ------------------------------------------------------------
 // MAIN USER ROUTE: /
@@ -66,9 +68,8 @@ userRouter
   .get(getAllUsers)
   .post(createUser)
   .delete(
-      protect,                  // Must be logged in
-      restrictTo('user'),       // Only user role can delete self
-      deleteUser
+    protect,                  // Only user role can delete self
+    deleteUser
   );
 
 

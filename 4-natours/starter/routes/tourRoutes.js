@@ -2,15 +2,15 @@
 const express = require('express');
 
 // Import controller functions for tours
-const { 
-    getMonthlyPlan, 
-    getAllTours, 
-    createTour, 
-    getTour, 
-    updateTour, 
-    deleteTour, 
-    getTourStats, 
-    alaisTopTours 
+const {
+    getMonthlyPlan,
+    getAllTours,
+    createTour,
+    getTour,
+    updateTour,
+    deleteTour,
+    getTourStats,
+    alaisTopTours
 } = require('../controllers/toursController');
 
 // Import authentication & authorization middleware
@@ -64,8 +64,8 @@ tourRouter
 // ------------------------------------------------------------
 tourRouter
     .route('/')
-    .get(protect, getAllTours)     // Only logged-in users can view tours
-    .post(createTour);             // Anyone can create a tour (can restrict later)
+    .get(getAllTours)     // Only logged-in users can view tours
+    .post(protect, restrictTo('admin', 'lead-guide'), createTour);             // Anyone can create a tour (can restrict later)
 
 
 // ------------------------------------------------------------
@@ -74,7 +74,11 @@ tourRouter
 // ------------------------------------------------------------
 tourRouter
     .route('/tour-monthlyPlan/:year')
-    .get(getMonthlyPlan);
+    .get(
+        protect,
+        restrictTo('admin', 'lead-guide', 'guide'),
+        getMonthlyPlan
+    );
 
 
 // ------------------------------------------------------------
@@ -86,7 +90,11 @@ tourRouter
 tourRouter
     .route('/:id')
     .get(getTour)
-    .patch(updateTour)
+    .patch(
+        protect,
+        restrictTo('admin', 'lead-guide'),
+        updateTour
+    )
     .delete(
         protect,                           // User must be logged in
         restrictTo('admin', "lead-guide"), // Only admin or lead-guide can delete tours

@@ -22,7 +22,7 @@ const { protect, restrictTo } = require('../controllers/authController');
 // ------------------------------------------------------------
 const reviewRouter = express.Router({ mergeParams: true });
 
-
+reviewRouter.use(protect); // All routes after this require authentication
 
 // ------------------------------------------------------------
 // ROUTE: GET /  → Get all reviews
@@ -31,8 +31,7 @@ const reviewRouter = express.Router({ mergeParams: true });
 reviewRouter
     .route('/')
     .get(getAllReviews)                       // Fetch all reviews
-    .post(
-        protect,                              // User must be logged in
+    .post(                              // User must be logged in
         restrictTo('user'),
         createReviewPreHandler,               // Pre-handler to auto-fill tour and user IDs
         createReview
@@ -59,12 +58,10 @@ reviewRouter
     .route('/:id')
     .get(getReview)                           // Get a single review by ID
     .patch(
-        protect,
-        restrictTo('user'),
+        restrictTo('user', 'admin'),          // Only user or admin roles may
         updateReview
     )                          // Must be authenticated
     .delete(
-        protect,                              // Must be authenticated
         restrictTo('user', 'admin'),          // Only user or admin roles may delete reviews
         deleteReview
     );
