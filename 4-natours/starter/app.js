@@ -4,6 +4,25 @@
 const express = require('express');
 const app = express();
 
+
+// Core Node.js module used to work with file and directory paths safely
+const path = require('path');
+
+// Tell Express that we want to use Pug as the template (view) engine
+app.set('view engine', 'pug');
+
+// Tell Express where our Pug template files are located
+// __dirname gives the absolute path of the current file's directory
+// path.join(...) safely creates a full path to the 'views' folder
+app.set('views', path.join(__dirname, 'views'));
+
+
+// 1) Serve static files from "public" folder
+// E.g. CSS, Images, Client-Side JS → available at domain.com/file.jpg
+// app.use(express.static(`${__dirname}/public`));
+app.use(express.static(path.join(__dirname, 'public')));
+
+
 const morgan = require('morgan');
 const helmet = require('helmet');                    // Security headers
 const mongoSanitize = require('express-mongo-sanitize'); // Prevent NoSQL injection
@@ -20,10 +39,6 @@ const reviewRouter = require('./routes/reviewRoutes');
 // -------------------------------
 // GLOBAL MIDDLEWARES (with explanations)
 // -------------------------------
-
-// 1) Serve static files from "public" folder
-// E.g. CSS, Images, Client-Side JS → available at domain.com/file.jpg
-app.use(express.static(`${__dirname}/public`));
 
 
 // 2) Set Security HTTP Headers
@@ -43,7 +58,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 app.use(hpp({
-    whitelist:[
+    whitelist: [
         'duration'
     ]
 }))
@@ -88,9 +103,12 @@ app.use((req, res, next) => {
     next();
 });
 
+app.get('/', (req, res) => {
+    res.render('base', { title: 'The Park Camper ' });
+});
 
 // -------------------------------
-// ROUTES
+// API ROUTES
 // -------------------------------
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
