@@ -32,6 +32,7 @@ const hpp = require('hpp')                          // use to handle the paramet
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./utils/appError');
 
+const viewRouter = require('./routes/viewRouter')
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
@@ -103,19 +104,11 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/', (req, res) => {
-    res.render('base',
-         { 
-            title: 'The Park Camper',
-            tour: 'The Forest Hiker',
-            user: 'Rahul'
-
-         });
-});
 
 // -------------------------------
 // API ROUTES
 // -------------------------------
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
