@@ -104,7 +104,13 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-    res.render('base', { title: 'The Park Camper ' });
+    res.render('base',
+         { 
+            title: 'The Park Camper',
+            tour: 'The Forest Hiker',
+            user: 'Rahul'
+
+         });
 });
 
 // -------------------------------
