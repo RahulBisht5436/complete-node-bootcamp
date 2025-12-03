@@ -10,7 +10,9 @@ const {
     updateTour,
     deleteTour,
     getTourStats,
-    alaisTopTours
+    getToursWithin,
+    alaisTopTours,
+    getToursDistance
 } = require('../controllers/toursController');
 
 // Import authentication & authorization middleware
@@ -48,6 +50,11 @@ tourRouter
     .route('/top-5-cheap')
     .get(alaisTopTours, getAllTours);
 
+    
+tourRouter
+    .route('/distance/:lnglat/unit/:unit')
+    .get(getToursDistance);
+
 
 // ------------------------------------------------------------
 // TOUR STATISTICS (Aggregation pipeline)
@@ -67,6 +74,11 @@ tourRouter
     .get(getAllTours)     // Only logged-in users can view tours
     .post(protect, restrictTo('admin', 'lead-guide'), createTour);             // Anyone can create a tour (can restrict later)
 
+tourRouter
+    .route('/tours-within/:distance/center/:lnglat/unit/:unit')
+    .get(getToursWithin);
+///tours-distance?distance=233&center-48,45&unit=mi
+///tours-distance/233/center/-40,45/unit/mi
 
 // ------------------------------------------------------------
 // MONTHLY PLAN ROUTE

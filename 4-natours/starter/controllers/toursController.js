@@ -68,8 +68,60 @@ const updateTour = updateOne(Tour);
 // ------------------------------------------------------------
 const deleteTour = deleteOne(Tour);
 
+// /tours-within/:distance/center/:latlng/unit/:unit
+const getToursWithin = catchAsync(async (req, res, next) => {
+    console.log("inside getToursWithin");
+    console.log(req.params);
+    const { distance, lnglat, unit } = req.params;
+
+    if (!lnglat || !distance || !unit) {
+        return next(new AppError('Please provide distance, center (lnglat), and unit parameters.', 400));
+    }
+
+    const [lng, lat] = lnglat.split(',');
+
+    if (!lat || !lng) {
+        return next(new AppError('Please provide latitude and longitude in the format lat,lng.', 400));
+    }
+
+    console.log(distance, lat, lng, unit, distance / (unit === 'mi' ? 3963.2 : 6378.1));
+
+    // Find all tours whose startLocation is within a certain distance
+    // from the given longitude (lng) and latitude (lat)
+    const tours = await Tour.find({
+
+        // We are filtering based on the startLocation field in our documents
+        startLocation: {
+
+            // $geoWithin → Find documents inside a given geometric shape
+            $geoWithin: {
+
+                // $centerSphere → Defines a circular area on Earth's sphere
+                $centerSphere: [
+
+                    // 1️⃣ Center of the circle (longitude, latitude)
+                    // lng * 1 and lat * 1 convert strings to numbers if necessary
+                    [lng * 1, lat * 1],
+
+                    // 2️⃣ Radius of the circle IN RADIANS
+                    // MongoDB expects radius in radians, not miles/kilometers
+                    // Formula: distance / Earth's radius
+                    // If user wants miles → use 3963.2 (Earth radius in miles)
+                    // If user wants kilometers → use 6378.1 (Earth radius in km)
+                    distance / (unit === 'mi' ? 3963.2 : 6378.1)
+                ]
+            }
+        }
+    });
 
 
+
+    res.status(200).json({
+        status: 'success',
+        message: 'getToursWithin endpoint works',
+        results: tours
+    });
+})
 // ------------------------------------------------------------
 // GET TOUR STATISTICS
 //
@@ -103,7 +155,16 @@ const getTourStats = catchAsync(async (req, res, next) => {
     });
 });
 
-
+const getToursDistance = catchAsync(async (req, res, next) => {
+    console.log("inside getToursDistance",req.params);
+    const { lnglat, unit } = req.params;
+    const [lng, lat] = lnglat.split(',');
+    console.log(lng, lat, unit,"this is the data for lat lng unit");
+    return res.status(200).json({
+        status: 'success',
+        message: 'getToursDistance endpoint works'
+    });
+})
 
 // ------------------------------------------------------------
 // GET MONTHLY PLAN
@@ -164,5 +225,7 @@ module.exports = {
     updateTour,
     deleteTour,
     alaisTopTours,
+    getToursWithin,
+    getToursDistance,
     getTourStats
 };

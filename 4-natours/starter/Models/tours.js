@@ -213,6 +213,8 @@ tourSchema.virtual('reviews', {
 
 tourSchema.index({ price: 1, ratingAverage: -1 });
 tourSchema.index({ slug: 1 });
+// it tells mongoose to create a special geospatial index
+tourSchema.index({ startLocation: '2dsphere' });
 
 tourSchema.virtual('durationWeeks').get(function () {
     return this.duration / 7;
