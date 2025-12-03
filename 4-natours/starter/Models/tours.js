@@ -172,10 +172,15 @@ tourSchema.pre('save', function (next) {
 // AGGREGATION MIDDLEWARE
 // Excludes secret tours from all aggregation pipelines
 // ------------------------------------------------------------
-tourSchema.pre('aggregate', function (next) {
-    this.pipeline().unshift({ $match: { secreteTours: { $ne: true } } });
-    next();
-});
+
+// tourSchema.pre('aggregate', function (next) {
+//     this.pipeline().unshift({ $match: { secreteTours: { $ne: true } } });
+//     if(process.env.NODE_ENV==='development'){
+//         console.log(this.pipeline()," <- Pre Aggregation Pipeline" );
+//     }
+    
+//     next();
+// });
 
 
 

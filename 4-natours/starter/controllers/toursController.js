@@ -159,10 +159,36 @@ const getToursDistance = catchAsync(async (req, res, next) => {
     console.log("inside getToursDistance",req.params);
     const { lnglat, unit } = req.params;
     const [lng, lat] = lnglat.split(',');
-    console.log(lng, lat, unit,"this is the data for lat lng unit");
+    if (!lat || !lng || !unit) {
+        return next(new AppError('Please provide latitude, longitude and unit in the format lat,lng and unit.', 400));
+    }
+
+    const data = await Tour.aggregate([
+        {
+            $geoNear: {
+                near: {
+                    type: 'Point',
+                    coordinates: [lng * 1, lat * 1]
+                },
+                distanceField: 'distance',
+                distanceMultiplier: unit === 'mi' ? 0.000621371 : 0.001
+            }
+        },{
+            $project: {
+                distance: 1,
+                name: 1
+            }
+        },
+        {
+            $sort: { distance: -1}
+        }
+    ])
+    console.log(data);
+
     return res.status(200).json({
         status: 'success',
-        message: 'getToursDistance endpoint works'
+        message: 'getToursDistance endpoint works',
+        data: data
     });
 })
 
