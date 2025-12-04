@@ -37,15 +37,20 @@ block content
               svg.card__icon
                 use(xlink:href="img/icons.svg#icon-user")
               span= `${cardData.maxGroupSize} People`
-
+          
           .card__footer
-            p
-              span.card__footer-value $297
-              span.card__footer-text per person
-
-            p.card__ratings
-              span.card__footer-value 4.9
-              span.card__footer-text rating (21)
-
-            a.btn.btn--green.btn--small(href="#") Details
+            .card__footer_text
+              p
+                span.card__footer-value $#{cardData.price}
+                |
+                span.card__footer-text per person
+              if cardData.ratingQuantity > 0
+                p.card__ratings
+                  span.card__footer-value #{cardData.ratingAverage}
+                  |
+                  |
+                  span.card__footer-text rating (#{cardData.ratingQuantity})
+            if cardData.slug 
+              .card__footer_btn
+                a.btn.btn--green.btn--small(href=`/tours/${cardData.slug}`) Details
 

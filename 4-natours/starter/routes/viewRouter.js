@@ -4,6 +4,6 @@ const viewRouter = express.Router();
 
 viewRouter.route('/').get( getOverview )
 
-viewRouter.route('/tour').get( getTourUI )
+viewRouter.route('/tours/:slug').get( getTourUI )
 
 module.exports = viewRouter
