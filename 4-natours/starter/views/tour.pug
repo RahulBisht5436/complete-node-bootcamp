@@ -1,18 +1,12 @@
 extends base
-mixin overviewDiv(svgIcon, overviewLabel, overviewText)
-    .overview-box__detail
-            svg.overview-box__icon
-              use(xlink:href=`/img/icons.svg#icon-${svgIcon}`)
-            span.overview-box__label= overviewLabel 
-            span.overview-box__text= overviewText
-mixin guideCode(name,designation,imageUrl)
-    .overview-box__detail
-        if imageUrl
-         img.overview-box__img(src=`/img/users/${imageUrl}`, alt=`${designation}`)
-        if designation
-         span.overview-box__label= designation
-        if name
-         span.overview-box__text= name
+
+
+
+//- all the mixin for the tour are inside this mixin
+include ./mixin/tourMixin.pug
+
+
+
 
 block content
   section.section-header
@@ -59,14 +53,6 @@ block content
             if i <= 2
               +guideCode(guide.name, role, guide.photo)
 
-          
-        //-   original template
-        //-   .overview-box__detail
-        //-     img.overview-box__img(src='/img/users/user-19.jpg', alt='Lead guide')
-        //-     span.overview-box__label Lead guide
-        //-     span.overview-box__text Steven Miller
-          
-
     .description-box
       h2.heading-secondary.ma-bt-lg= `About ${data.name} tour`
       - const description = data.description.split('\n')
@@ -75,27 +61,20 @@ block content
       
 
   section.section-pictures
-    .picture-box
-      img.picture-box__img.picture-box__img--1(src='/img/tour-5-1.jpg', alt='The Park Camper Tour 1')
-    .picture-box
-      img.picture-box__img.picture-box__img--2(src='/img/tour-5-2.jpg', alt='The Park Camper Tour 1')
-    .picture-box
-      img.picture-box__img.picture-box__img--3(src='/img/tour-5-3.jpg', alt='The Park Camper Tour 1')
+    each image in data.images
+      +showImages(image)
 
   section.section-map
     #map
 
+  
+  
   section.section-reviews
     .reviews
-      .reviews__card
-        .reviews__avatar
-          img.reviews__avatar-img(src='/img/users/user-7.jpg', alt='Jim Brown')
-          h6.reviews__user Jim Brown
-        p.reviews__text Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque dignissimos sint quo commodi corrupti.
-        .reviews__rating
-          each i in [1,2,3,4,5]
-            svg.reviews__star.reviews__star--active
-              use(xlink:href='/img/icons.svg#icon-star')
+
+      each review in data.reviews
+        +renderReviews(review.user.name,review.review,review.rating,review.user.photo)
+      
 
   section.section-cta
     .cta
