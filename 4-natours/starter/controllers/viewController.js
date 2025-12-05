@@ -1,4 +1,5 @@
 // Importing the Tours model to interact with the MongoDB 'tours' collection
+const { title } = require('process');
 const Tours = require('./../Models/tours');
 
 // Importing a utility function to handle async errors without using try/catch everywhere
@@ -23,7 +24,8 @@ const getOverview = catchAsync(
 
         // Render the overview.pug view with the data
         return res.status(200).render('overview', {
-            data: allToursData
+            data: allToursData,
+            title :"Nature Explorer"
         });
     }
 );
@@ -51,7 +53,10 @@ const getTourUI = async (req, res) => {
       return res.status(404).send("Tour Data is not Available");
     }
 
-    return res.status(200).render('tour', { data: tourData });
+    return res.status(200).render('tour', {
+       data: tourData,
+       title : tourData.name 
+      });
   } catch (err) {
     console.log(err);
     return res.status(500).send("Something went wrong");

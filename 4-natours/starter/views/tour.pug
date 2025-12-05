@@ -1,12 +1,11 @@
 extends base
 
-
-
 //- all the mixin for the tour are inside this mixin
 include ./mixin/tourMixin.pug
+include ./mixin/utilityMixin.pug
 
-
-
+block prepend head
+  script(src="/js/mapbox.js")
 
 block content
   section.section-header
@@ -71,18 +70,19 @@ block content
   
   section.section-reviews
     .reviews
-
       each review in data.reviews
+        //- +utilityPrint(review)
         +renderReviews(review.user.name,review.review,review.rating,review.user.photo)
       
-
+  p.classtest= data.images[0]
+  
   section.section-cta
     .cta
       .cta__img.cta__img--logo
         img(src='/img/logo-white.png', alt='Natours logo')
-      img.cta__img.cta__img--1(src='/img/tour-5-2.jpg', alt='')
-      img.cta__img.cta__img--2(src='/img/tour-5-1.jpg', alt='')
+      img.cta__img.cta__img--1(src=`/img/tours/${data.images[1]}`, alt='')
+      img.cta__img.cta__img--2(src=`/img/tours/${data.images[2]}`, alt='')
       .cta__content
         h2.heading-secondary What are you waiting for?
-        p.cta__text 10 days. 1 adventure. Infinite memories. Make it yours today!
+        p.cta__text #{data.duration} days. 1 adventure. Infinite memories. Make it yours today!
         button.btn.btn--green.span-all-rows Book tour now!
