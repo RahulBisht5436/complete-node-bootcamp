@@ -48,7 +48,48 @@ const reviewRouter = require('./routes/reviewRoutes');
 // - Strict-Transport-Security
 // - X-Frame-Options (Prevents clickjacking)
 // - X-XSS-Protection
-app.use(helmet());
+// Whitelist external sources for Leaflet + OSM + Fonts
+
+
+const scriptSrcUrls = [
+    "https://unpkg.com",
+    "https://*.tile.openstreetmap.org"
+];
+
+const styleSrcUrls = [
+    "https://unpkg.com",
+    "https://fonts.googleapis.com"
+];
+
+const fontSrcUrls = [
+    "https://fonts.gstatic.com"
+];
+
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'"],
+
+            connectSrc: ["'self'", ...scriptSrcUrls],
+
+            scriptSrc: ["'self'", "'unsafe-inline'", ...scriptSrcUrls],
+
+            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+
+            // 👇 THIS IS NEW (Tile images allowed!)
+            imgSrc: [
+                "'self'",
+                "data:",
+                "blob:",
+                "https://*.tile.openstreetmap.org"
+            ],
+
+            fontSrc: ["'self'", ...fontSrcUrls]
+        }
+    })
+);
+
+
 
 
 // 3) Development request logging

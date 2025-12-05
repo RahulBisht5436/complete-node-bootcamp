@@ -5,7 +5,11 @@ include ./mixin/tourMixin.pug
 include ./mixin/utilityMixin.pug
 
 block prepend head
+  link(rel="stylesheet" ,href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css")
+  script(src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js")
   script(src="/js/mapbox.js")
+
+
 
 block content
   section.section-header
@@ -31,13 +35,15 @@ block content
       div
         .overview-box__group
           h2.heading-secondary.ma-bt-lg Quick facts
-          
+
           +overviewDiv("calendar","Next date",`${new Date(data.startDates[0]).toLocaleString('en-US', {month: 'long',year: 'numeric'})}`)
           +overviewDiv("trending-up","Difficulty",`${data.difficulty}`)
           +overviewDiv("user","Participants", `${data.maxGroupSize}`)
           if data.ratingAverage >0
             +overviewDiv("star","Rating",`${data.ratingAverage} / 5`)
 
+
+        if data.guides.length > 0
         .overview-box__group
           h2.heading-secondary.ma-bt-lg Your tour guides
           each guide, i in data.guides
@@ -48,7 +54,7 @@ block content
               - role = "GUIDE"
             else
               - role = "INTERN"
-            
+
             if i <= 2
               +guideCode(guide.name, role, guide.photo)
 
@@ -57,25 +63,25 @@ block content
       - const description = data.description.split('\n')
       each para in description 
         p.description__text= para  
-      
+
 
   section.section-pictures
     each image in data.images
       +showImages(image)
 
   section.section-map
-    #map
+    #map(data-locations=`${JSON.stringify(data.locations)}`)
 
-  
-  
-  section.section-reviews
-    .reviews
-      each review in data.reviews
-        //- +utilityPrint(review)
-        +renderReviews(review.user.name,review.review,review.rating,review.user.photo)
-      
+
+  if data.reviews.length > 0
+    section.section-reviews
+      .reviews
+        each review in data.reviews
+          //- +utilityPrint(review)
+          +renderReviews(review.user.name,review.review,review.rating,review.user.photo)
+
   p.classtest= data.images[0]
-  
+
   section.section-cta
     .cta
       .cta__img.cta__img--logo
@@ -86,3 +92,5 @@ block content
         h2.heading-secondary What are you waiting for?
         p.cta__text #{data.duration} days. 1 adventure. Infinite memories. Make it yours today!
         button.btn.btn--green.span-all-rows Book tour now!
+
+
