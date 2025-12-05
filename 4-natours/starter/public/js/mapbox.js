@@ -1,8 +1,7 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     const locations = document.getElementById("map")?.getAttribute("data-locations")
-    const locationJSON = JSON.parse(locations)
-    console.log(locationJSON[0].coordinates)
+    const locationJSON = JSON.parse(locations);
     // Create a Leaflet map centered on first location
     const map = L.map('map', { zoomControl: false }).setView(
         [...locationJSON[0].coordinates.reverse()],

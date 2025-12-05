@@ -22,6 +22,9 @@ app.set('views', path.join(__dirname, 'views'));
 // app.use(express.static(`${__dirname}/public`));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// for parsing the cookie like the express the param and query
+const cookieParser = require("cookie-parser")
+app.use(cookieParser())
 
 const morgan = require('morgan');
 const helmet = require('helmet');                    // Security headers
@@ -53,7 +56,8 @@ const reviewRouter = require('./routes/reviewRoutes');
 
 const scriptSrcUrls = [
     "https://unpkg.com",
-    "https://*.tile.openstreetmap.org"
+    "https://*.tile.openstreetmap.org",
+    "https://cdn.jsdelivr.net"
 ];
 
 const styleSrcUrls = [
@@ -64,7 +68,11 @@ const styleSrcUrls = [
 const fontSrcUrls = [
     "https://fonts.gstatic.com"
 ];
-
+const connectSrcUrls = [
+  "'self'",
+  "https://cdn.jsdelivr.net",
+  "https://cdn.jsdelivr.net/npm/axios/dist/"
+];
 app.use(
     helmet.contentSecurityPolicy({
         directives: {
@@ -75,6 +83,7 @@ app.use(
             scriptSrc: ["'self'", "'unsafe-inline'", ...scriptSrcUrls],
 
             styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+            connectSrc: [...connectSrcUrls],
 
             // 👇 THIS IS NEW (Tile images allowed!)
             imgSrc: [

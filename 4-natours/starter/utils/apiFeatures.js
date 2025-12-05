@@ -21,7 +21,6 @@ class APIFeatures {
     // into MongoDB form ($gte / $gt / $lte / $lt)
     // --------------------------------------------------------
     filter() {
-        console.log('filter function called successfully');
 
         // Create a shallow copy of queryString
         const queryObj = { ...this.queryString };
@@ -53,7 +52,6 @@ class APIFeatures {
     // Default: no sorting applied
     // --------------------------------------------------------
     sort() {
-        console.log('sort function called successfully');
 
         if (this.queryString.sort) {
             // Convert comma-separated fields into space-separated string
@@ -71,7 +69,6 @@ class APIFeatures {
     // Default: return all fields
     // --------------------------------------------------------
     limitFields() {
-        console.log('limitFields function called successfully');
 
         if (this.queryString.fields) {
             // Convert CSV fields to space-separated string
@@ -89,7 +86,6 @@ class APIFeatures {
     // Default: page=1, limit=100
     // --------------------------------------------------------
     paginate() {
-        console.log('paginate function called successfully');
 
         // Convert strings to numbers using *1
         const page = this.queryString.page * 1 || 1;

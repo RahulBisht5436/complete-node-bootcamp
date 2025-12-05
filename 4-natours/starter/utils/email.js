@@ -14,7 +14,6 @@ const catchAsync = require('./catchAsync');    // Async wrapper (not used here)
 // ------------------------------------------------------------
 const sendEmail = async (options) => {
 
-  console.log("akushiagsid");   // Debug log
 
   // --------------------------------------------------------
   // Create transporter (email sending engine)

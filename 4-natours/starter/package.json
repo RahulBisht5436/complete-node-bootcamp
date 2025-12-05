@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "express-mongo-sanitize": "^2.2.0",
@@ -21,7 +22,6 @@
     "hpp": "^0.2.3",
     "i": "^0.3.7",
     "jsonwebtoken": "^9.0.2",
-    "leaflet": "^1.9.4",
     "mongoose": "^5.13.23",
     "morgan": "^1.10.1",
     "ndb": "^1.1.5",

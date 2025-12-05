@@ -176,7 +176,6 @@ tourSchema.pre('save', function (next) {
 // tourSchema.pre('aggregate', function (next) {
 //     this.pipeline().unshift({ $match: { secreteTours: { $ne: true } } });
 //     if(process.env.NODE_ENV==='development'){
-//         console.log(this.pipeline()," <- Pre Aggregation Pipeline" );
 //     }
     
 //     next();

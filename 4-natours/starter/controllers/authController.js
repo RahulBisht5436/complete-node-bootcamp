@@ -75,6 +75,8 @@ const protect = catchAsync(async function protect(req, res, next) {
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(" ")[1];
+    } else if (req.cookies.jwt) {
+        token = req.cookies.jwt
     }
 
     // If no token found
@@ -102,6 +104,39 @@ const protect = catchAsync(async function protect(req, res, next) {
     next();
 });
 
+
+
+// ----------------------------------------------------
+// CONDITIONAL PROTECT Middleware - Check login and validate token
+// ----------------------------------------------------
+const conditionalProtect = catchAsync(async function conditionalProtect(req, res, next) {
+
+    // 1. Extract token from Authorization header
+    let token;
+    if (req.cookies.jwt) {
+        token = req.cookies.jwt
+    
+    // 2. Verify token
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+    // 3. Check if user still exists
+    const freshUser = await User.findById(decoded.id);
+    if (!freshUser) {
+        return next();
+    }
+
+    // 4. Check if user changed password after token was issued
+    const changePassword = freshUser.changedPasswordAfter(decoded.iat);
+    if (changePassword) {
+        return next();
+    }
+    console.log("Protected route accessed by user:", freshUser.id);
+    // Grant access to protected route
+    res.locals.user
+    req.user = freshUser;
+    next();
+}
+});
 
 
 // ----------------------------------------------------
@@ -308,6 +343,7 @@ module.exports = {
     signup,
     login,
     protect,
+    conditionalProtect,
     restrictTo,
     updatePassword,
     updateMe,

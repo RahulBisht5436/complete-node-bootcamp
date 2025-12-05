@@ -18,16 +18,16 @@ const path = require('path');
  *  3️⃣ Pass the fetched tours data to the template
  */
 const getOverview = catchAsync(
-    async (req, res) => {
-        // Get all tour documents from the Tours collection
-        const allToursData = await Tours.find();
+  async (req, res) => {
+    // Get all tour documents from the Tours collection
+    const allToursData = await Tours.find();
 
-        // Render the overview.pug view with the data
-        return res.status(200).render('overview', {
-            data: allToursData,
-            title :"Nature Explorer"
-        });
-    }
+    // Render the overview.pug view with the data
+    return res.status(200).render('overview', {
+      data: allToursData,
+      title: "Nature Explorer"
+    });
+  }
 );
 
 
@@ -54,14 +54,20 @@ const getTourUI = async (req, res) => {
     }
 
     return res.status(200).render('tour', {
-       data: tourData,
-       title : tourData.name 
-      });
+      data: tourData,
+      title: tourData.name
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).send("Something went wrong");
   }
 };
 
+const login = catchAsync(async (req, res, next) => {
+  return res.status(200).render('login', {
+    title: "Login Page"
+  })
+})
+
 // Exporting the functions so they can be used in viewRouter.js
-module.exports = { getOverview, getTourUI };
+module.exports = { getOverview, getTourUI, login };
