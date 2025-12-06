@@ -7,6 +7,7 @@ const catchAsync = require('./../utils/catchAsync');
 
 // Node.js built-in module to work with file and directory paths (not actually used below but imported)
 const path = require('path');
+const { token } = require('morgan');
 
 /**
  * ===============================
@@ -69,5 +70,22 @@ const login = catchAsync(async (req, res, next) => {
   })
 })
 
+const logout = catchAsync(async (req, res, next) => {
+  console.log("isnide the currect handler")
+  const cookieOptions = {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  }
+  if (process.env.NODE_ENV == "production") {
+    cookieOptions.secure = true
+  }
+  res.cookie('jwt', "", cookieOptions)
+  return res.status(200).json({
+    'status': "success",
+    'statusCode': 200,
+    "token":''
+  })
+})
+
 // Exporting the functions so they can be used in viewRouter.js
-module.exports = { getOverview, getTourUI, login };
+module.exports = { getOverview, getTourUI, login, logout };

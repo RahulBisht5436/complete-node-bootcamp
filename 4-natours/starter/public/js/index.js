@@ -1,5 +1,5 @@
 // Import the named function "Login" from the "login.js" file (must use the same name)
-import { Login } from './login';
+import { Login, Logout } from './login';
 
 // Import Babel polyfill for older browsers (adds support for async/await, Promises, etc.)
 import '@babel/polyfill';
@@ -26,4 +26,15 @@ if (formElement) {
             Login(emailData, passwordData);
         }
     });
+}
+
+
+
+//logout functionality 
+const logoutButtons = document.querySelectorAll(".logout_button")
+if(logoutButtons.length >0){
+    logoutButtons.forEach(button=>{
+        console.log(button)
+        button.addEventListener("click",Logout)
+    })
 }

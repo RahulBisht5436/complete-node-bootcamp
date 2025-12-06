@@ -171,7 +171,7 @@ app.use('/api/v1/reviews', reviewRouter);
 // -------------------------------
 // Any request that doesn't match any route hits this middleware.
 app.all('*', (req, res, next) => {
-    res.status(404).send("ajkshduyay")
+    res.status(404).send("Page is not available right now")
     // next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
