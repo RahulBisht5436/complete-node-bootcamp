@@ -99,29 +99,33 @@ app.use(
   })
 );
 
-
-
+if (process.env.NODE_ENV == "development") {
+  app.use((req, res, next) => {
+    console.log('REQ:', req.method, req.originalUrl,);
+    next();
+  });
+}
 
 
 // 3) Development request logging
 // Logs method, status code, response time, etc.
 // Example log: GET /api/v1/users 200 15ms
 if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'));
+  app.use(morgan('dev'));
 }
 
 app.use(hpp({
-    whitelist: [
-        'duration'
-    ]
+  whitelist: [
+    'duration'
+  ]
 }))
 
 // 4) Rate Limiting (Protect from brute-force & API abuse)
 // Allows max 100 requests per IP per hour for routes starting with /api
 const limiter = rateLimiter({
-    max: 100,                                      // Limit each IP
-    windowMs: 60 * 60 * 1000,                      // 1 hour
-    message: "Too many requests from this IP, try again in an hour."
+  max: 100,                                      // Limit each IP
+  windowMs: 60 * 60 * 1000,                      // 1 hour
+  message: "Too many requests from this IP, try again in an hour."
 });
 app.use('/api', limiter);
 
@@ -152,8 +156,8 @@ app.use(xss());
 // 9) Add request timestamp
 // Makes req.requestTime available in routes (useful for logs)
 app.use((req, res, next) => {
-    req.requestTime = new Date().toISOString();
-    next();
+  req.requestTime = new Date().toISOString();
+  next();
 });
 
 
@@ -171,8 +175,11 @@ app.use('/api/v1/reviews', reviewRouter);
 // -------------------------------
 // Any request that doesn't match any route hits this middleware.
 app.all('*', (req, res, next) => {
-    res.status(404).send("Page is not available right now")
-    // next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+  res.status(404).render('error.pug', {
+    title: "No Page found",
+    message: "Uh oh! Something went wrong!"
+  })
+  // next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
 

@@ -1,5 +1,6 @@
 // Import the named function "Login" from the "login.js" file (must use the same name)
 import { Login, Logout } from './login';
+import { updateUserInfo } from './accountUpdate';
 
 // Import Babel polyfill for older browsers (adds support for async/await, Promises, etc.)
 import '@babel/polyfill';
@@ -37,4 +38,36 @@ if(logoutButtons.length >0){
         console.log(button)
         button.addEventListener("click",Logout)
     })
+}
+
+
+
+const formData = document.querySelector(".form-user-data");
+if (formData) {
+  formData.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+
+    if (!nameInput || !emailInput) return;
+
+    // Original values from server-rendered attributes
+    const originalEmail = emailInput.defaultValue;
+    const originalName = nameInput.defaultValue;
+
+    // New values entered by user
+    const updatedEmail = emailInput.value.trim();
+    const updatedName = nameInput.value.trim();
+
+    // Only call update API if there is an actual change
+    const isDataChanged =
+      originalEmail !== updatedEmail || originalName !== updatedName;
+    if (!isDataChanged) {
+      return;
+    }
+
+
+    updateUserInfo(updatedEmail, updatedName, user);
+  });
 }

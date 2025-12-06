@@ -60,12 +60,20 @@ const handleDuplicateFieldsDB = err => {
 // Includes full stack + error object for debugging
 // -----------------------------------------------------------
 const sendErrorDev = (err, req, res) => {
-    res.status(err.statusCode).json({
-        status: err.status,
-        error: err,
-        message: err.message,
-        stack: err.stack
-    });
+    //  handling for the server and production server error
+    if (process.env.NODE_ENV == "production") {
+        res.status(err.statusCode).render('error.pug', {
+            title: "SomeThing Went Wrong",
+            message: "SomeThing Went Wrong"
+        })
+    } else {
+        res.status(err.statusCode).json({
+            status: err.status,
+            error: err,
+            message: err.message,
+            stack: err.stack
+        });
+    }
 };
 
 

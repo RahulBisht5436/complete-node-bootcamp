@@ -1,5 +1,5 @@
 const express = require('express');
-const { getOverview, getTourUI, login , logout } = require('./../controllers/viewController')
+const { getOverview, getTourUI, account,login , logout } = require('./../controllers/viewController')
 const { conditionalProtect } = require('./../controllers/authController')
 const viewRouter = express.Router();
 
@@ -12,5 +12,9 @@ viewRouter.route('/tours/:slug').get(getTourUI)
 viewRouter.route('/login').get(login)
 
 viewRouter.route('/logout').get(logout)
+
+viewRouter.route('/account').get(account)
+
+// NOTE need to understand why if we put a .all router handler here it breaks the login functionalityvie
 
 module.exports = viewRouter

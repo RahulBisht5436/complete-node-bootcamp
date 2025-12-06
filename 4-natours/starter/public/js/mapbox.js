@@ -1,31 +1,31 @@
-
 document.addEventListener("DOMContentLoaded", () => {
-    const locations = document.getElementById("map")?.getAttribute("data-locations")
-    const locationJSON = JSON.parse(locations);
-    // Create a Leaflet map centered on first location
+    const el = document.getElementById("map");
+    if (!el) return console.error("Map element not found");
+
+    const locations = el.getAttribute("data-locations");
+    if (!locations) return console.error("No location data found");
+    
+    let locationJSON;
+    try {
+        locationJSON = JSON.parse(locations);
+    } catch (err) {
+        return console.error("Invalid JSON in data-locations", err);
+    }
+
+    const [lng, lat] = locationJSON[0].coordinates;
+
     const map = L.map('map', { zoomControl: false }).setView(
-        [...locationJSON[0].coordinates.reverse()],
+        [lat, lng],
         8
     );
 
-    // Add OSM tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Add markers for each location
     locationJSON.forEach(loc => {
-        L.marker([loc.coordinates[1], loc.coordinates[0]])
-            .addTo(map)
-            .bindPopup(loc.description);
+        const [lng, lat] = loc.coordinates;
+        L.marker([lat, lng]).addTo(map).bindPopup(loc.description);
     });
-
-
-
-
-})
-
-
-
-
+});

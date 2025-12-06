@@ -22,8 +22,10 @@ const getOverview = catchAsync(
   async (req, res) => {
     // Get all tour documents from the Tours collection
     const allToursData = await Tours.find();
+    console.log("called over view end point")
 
     // Render the overview.pug view with the data
+    res.locals.userData = req.user
     return res.status(200).render('overview', {
       data: allToursData,
       title: "Nature Explorer"
@@ -51,7 +53,10 @@ const getTourUI = async (req, res) => {
       .lean();
 
     if (!tourData) {
-      return res.status(404).send("Tour Data is not Available");
+      return res.status(404).render('error.pug',{
+        title : "No Tour found",
+        message:"No Tour Found"
+      })
     }
 
     return res.status(200).render('tour', {
@@ -87,5 +92,15 @@ const logout = catchAsync(async (req, res, next) => {
   })
 })
 
+const account = async function (req,res,next) {
+  const userObject = req.user
+  console.log(userObject)
+  res.status(200).render('account',{
+    title : "account",
+    user : userObject
+  })
+  
+}
+
 // Exporting the functions so they can be used in viewRouter.js
-module.exports = { getOverview, getTourUI, login, logout };
+module.exports = { getOverview, getTourUI, login, logout , account };

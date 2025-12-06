@@ -74,6 +74,12 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
         select: false              // Hide from API responses
+    },
+
+    // User profile photo filename
+    photo: {
+        type: String,
+        default: 'default.jpg'     // Default photo if none uploaded
     }
 });
 

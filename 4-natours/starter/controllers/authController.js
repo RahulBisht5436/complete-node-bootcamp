@@ -78,10 +78,11 @@ const protect = catchAsync(async function protect(req, res, next) {
     } else if (req.cookies.jwt) {
         token = req.cookies.jwt
     }
+    console.log(token, "i am inside the protect route")
 
     // If no token found
     if (!token) {
-        return next(new AppError("You are not logged in , kindly login to get access ", 500));
+        return next(new AppError("You are not logged in , kindly login to get access fsfdsdfsd", 500));
     }
 
     // 2. Verify token
@@ -132,12 +133,9 @@ const conditionalProtect = catchAsync(async function conditionalProtect(req, res
             console.log("line returned 132")
             return next();
         }
-        console.log("Protected route accessed by user:", freshUser.id);
         // Grant access to protected route
-        console.log("value of the res.locals is set")
-        res.locals.user=freshUser.toObject()   
+        res.locals.user = freshUser
         req.user = freshUser;
-        console.log("line returned 141")
     }
     next();
 });
@@ -255,9 +253,7 @@ const updatePassword = catchAsync(async function updatePassword(req, res, next) 
 // UPDATE USER PROFILE (name/email only)
 // ----------------------------------------------------
 const updateMe = catchAsync(async function updateMe(req, res, next) {
-
     const user = req.user;
-
     // If user not attached by protect()
     if (!user) {
         return next(new AppError("Can't identify user credential , kindly login again"), 401);
@@ -272,6 +268,8 @@ const updateMe = catchAsync(async function updateMe(req, res, next) {
         { name, email },
         { new: true, runValidators: true }
     );
+
+    console.log("updated user ...........")
 
     // Return updated user
     return res.status(200).json({
@@ -292,7 +290,10 @@ const restrictTo = (...roles) => {
         let token;
         if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
             token = req.headers.authorization.split(" ")[1];
+        } else if (req.cookies.jwt) {
+            token = req.cookies.jwt
         }
+        console.log("resteirc bajsdad")
         if (!token) {
             return next(new AppError("You are not logged in , kindly login to get access ", 500));
         }
