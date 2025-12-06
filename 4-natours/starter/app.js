@@ -53,50 +53,52 @@ const reviewRouter = require('./routes/reviewRoutes');
 // - X-XSS-Protection
 // Whitelist external sources for Leaflet + OSM + Fonts
 
-
 const scriptSrcUrls = [
-    "https://unpkg.com",
-    "https://*.tile.openstreetmap.org",
-    "https://cdn.jsdelivr.net"
+  "https://unpkg.com",
+  "https://*.tile.openstreetmap.org",
+  "https://cdn.jsdelivr.net"
 ];
 
 const styleSrcUrls = [
-    "https://unpkg.com",
-    "https://fonts.googleapis.com"
+  "https://unpkg.com",
+  "https://fonts.googleapis.com"
 ];
 
 const fontSrcUrls = [
-    "https://fonts.gstatic.com"
+  "https://fonts.gstatic.com"
 ];
+
 const connectSrcUrls = [
   "'self'",
-  "https://cdn.jsdelivr.net",
-  "https://cdn.jsdelivr.net/npm/axios/dist/"
+  "http://127.0.0.1:3000",    // 👈 Allow backend API requests
+  "http://localhost:3000",    // 👈 Optional
+  "https://cdn.jsdelivr.net",  // Axios CDN
 ];
+
 app.use(
-    helmet.contentSecurityPolicy({
-        directives: {
-            defaultSrc: ["'self'"],
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
 
-            connectSrc: ["'self'", ...scriptSrcUrls],
+      // 👇 Only one connectSrc — includes backend URL
+      connectSrc: [...connectSrcUrls],
 
-            scriptSrc: ["'self'", "'unsafe-inline'", ...scriptSrcUrls],
+      scriptSrc: ["'self'", "'unsafe-inline'", ...scriptSrcUrls],
 
-            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
-            connectSrc: [...connectSrcUrls],
+      styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
 
-            // 👇 THIS IS NEW (Tile images allowed!)
-            imgSrc: [
-                "'self'",
-                "data:",
-                "blob:",
-                "https://*.tile.openstreetmap.org"
-            ],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "blob:",
+        "https://*.tile.openstreetmap.org"
+      ],
 
-            fontSrc: ["'self'", ...fontSrcUrls]
-        }
-    })
+      fontSrc: ["'self'", ...fontSrcUrls]
+    }
+  })
 );
+
 
 
 

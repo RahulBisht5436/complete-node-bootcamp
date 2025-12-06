@@ -115,27 +115,31 @@ const conditionalProtect = catchAsync(async function conditionalProtect(req, res
     let token;
     if (req.cookies.jwt) {
         token = req.cookies.jwt
-    
-    // 2. Verify token
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-    // 3. Check if user still exists
-    const freshUser = await User.findById(decoded.id);
-    if (!freshUser) {
-        return next();
-    }
+        // 2. Verify token
+        const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-    // 4. Check if user changed password after token was issued
-    const changePassword = freshUser.changedPasswordAfter(decoded.iat);
-    if (changePassword) {
-        return next();
+        // 3. Check if user still exists
+        const freshUser = await User.findById(decoded.id);
+        if (!freshUser) {
+            console.log("line returned 125")
+            return next();
+        }
+
+        // 4. Check if user changed password after token was issued
+        const changePassword = freshUser.changedPasswordAfter(decoded.iat);
+        if (changePassword) {
+            console.log("line returned 132")
+            return next();
+        }
+        console.log("Protected route accessed by user:", freshUser.id);
+        // Grant access to protected route
+        console.log("value of the res.locals is set")
+        res.locals.user=freshUser.toObject()   
+        req.user = freshUser;
+        console.log("line returned 141")
     }
-    console.log("Protected route accessed by user:", freshUser.id);
-    // Grant access to protected route
-    res.locals.user
-    req.user = freshUser;
     next();
-}
 });
 
 
