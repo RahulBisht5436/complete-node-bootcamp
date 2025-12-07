@@ -12227,6 +12227,9 @@ var updateUserInfo = exports.updateUserInfo = /*#__PURE__*/function () {
           response = _context.v;
           // Show success notification to user
           (0, _alert.showAlerts)('success', 'Updated successfully!');
+          setTimeout(function () {
+            location.reload();
+          }, 1500);
           _context.n = 6;
           break;
         case 5:
@@ -13170,6 +13173,7 @@ if (formData) {
     // Grab input elements
     var nameInput = document.getElementById("name");
     var emailInput = document.getElementById("email");
+    var photoInput = document.getElementById("photo");
     if (!nameInput || !emailInput) return;
 
     // Original values rendered from server
@@ -13181,16 +13185,18 @@ if (formData) {
     var updatedName = nameInput.value.trim();
 
     // Check if any data has actually changed
-    var isDataChanged = originalEmail !== updatedEmail || originalName !== updatedName;
+    var isDataChanged = originalEmail !== updatedEmail || originalName !== updatedName || photoInput.files.length > 0;
 
     // Prevent unnecessary API call if no changes detected
     if (!isDataChanged) return;
-
+    var formData = new FormData();
+    formData.append('name', updatedName);
+    formData.append('email', updatedEmail);
+    if (photoInput.files.length > 0) {
+      formData.append('photo', photoInput.files[0]);
+    }
     // Send new data to API
-    (0, _accountUpdate.updateUserInfo)('infoUpdate', {
-      name: updatedName,
-      email: updatedEmail
-    });
+    (0, _accountUpdate.updateUserInfo)('infoUpdate', formData);
   });
 }
 
@@ -13242,7 +13248,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55286" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57432" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

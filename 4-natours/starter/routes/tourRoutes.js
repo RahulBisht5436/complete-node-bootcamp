@@ -7,6 +7,8 @@ const {
     getAllTours,
     createTour,
     getTour,
+    uploadTourImages,
+    imageModification,
     updateTour,
     deleteTour,
     getTourStats,
@@ -50,7 +52,7 @@ tourRouter
     .route('/top-5-cheap')
     .get(alaisTopTours, getAllTours);
 
-    
+
 tourRouter
     .route('/distance/:lnglat/unit/:unit')
     .get(getToursDistance);
@@ -105,6 +107,8 @@ tourRouter
     .patch(
         protect,
         restrictTo('admin', 'lead-guide'),
+        uploadTourImages,
+        imageModification,
         updateTour
     )
     .delete(

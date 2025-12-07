@@ -36,6 +36,9 @@ const updateUserInfo = async function (type, infoObject) {
 
         // Show success notification to user
         showAlerts('success', 'Updated successfully!');
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
 
     } catch (error) {
         // Show error message returned by the server

@@ -9,30 +9,10 @@ block content
   main.main
     //- +utilityPrint(user)
     .user-view
-      include ./snippets/accountUserView.pug
-      .admin-nav
-        h5.admin-nav__heading Admin
-        ul.side-nav
-          li
-            a(href='#')
-              svg
-                use(xlink:href='img/icons.svg#icon-map')
-              | Manage tours
-          li
-            a(href='#')
-              svg
-                use(xlink:href='img/icons.svg#icon-users')
-              | Manage users
-          li
-            a(href='#')
-              svg
-                use(xlink:href='img/icons.svg#icon-star')
-              | Manage reviews
-          li
-            a(href='#')
-              svg
-                use(xlink:href='img/icons.svg#icon-briefcase')
-              | Manage bookings
+      nav.user-view__menu
+        include ./snippets/accountUserView.pug
+        if user.role === 'admin'
+          include ./snippets/accountAdminView.pug
 
       .user-view__content
         .user-view__form-container
@@ -46,7 +26,8 @@ block content
               input#email.form__input(type='email', value=`${user.email}`, required)
             .form__group.form__photo-upload
               img.form__user-photo(src=`/img/users/${user.photo}`, alt='User photo')
-              a.btn-text(href='') Choose new photo
+              input(type="file", accept="image/*", id="photo" name='photo' class="form__upload")
+              label(for="photo") Choose new photo 
             .form__group.right
               button.btn.btn--small.btn--green.account_info_update Save settings
 

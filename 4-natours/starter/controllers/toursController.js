@@ -16,7 +16,88 @@ const catchAsync = require('../utils/catchAsync');
 // Factory delete and update handler (hard delete and update)
 const { deleteOne, updateOne, createOne, findOne, findAll } = require('./handlerFactory');
 
+// importing multer and sharp for file upload
+const multer = require('multer');
+const sharp = require('sharp');
 
+// Middleware: Modify and process uploaded images using Sharp
+const imageModification = catchAsync(async (req, res, next) => {
+    // If no files uploaded, move to the next middleware
+    if (!req.files) return next();
+
+    // 1️⃣ Process Cover Image (only if provided)
+    if (req.files.imageCover) {
+        // Create a unique filename for the cover image
+        req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+
+        // Resize and convert the cover image before saving
+        await sharp(req.files.imageCover[0].buffer)
+            .resize(2000, 1333)          // Maintain 3:2 ratio
+            .toFormat('jpeg')            // Convert image type
+            .jpeg({ quality: 90 })       // Compress image
+            .toFile(`public/img/tours/${req.body.imageCover}`); // Save to disk
+    }
+
+    // 2️⃣ Process Additional Images (Gallery images)
+    if (req.files.images) {
+        // Initialize array to store filenames of processed images
+        req.body.images = [];
+
+        // Process each file asynchronously and wait for all to finish
+        await Promise.all(
+            req.files.images.map(async (file, i) => {
+                // Unique name for each image using index
+                const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+
+                // Resize + convert each image
+                await sharp(file.buffer)
+                    .resize(2000, 1333)
+                    .toFormat('jpeg')
+                    .jpeg({ quality: 90 })
+                    .toFile(`public/img/tours/${filename}`);
+
+                // Push the filename to update DB later
+                req.body.images.push(filename);
+            })
+        );
+    }
+
+    // Proceed to next middleware after all images processed
+    next();
+});
+
+// Multer configuration to store files in memory temporarily (as buffer)
+const multerStorage = multer.memoryStorage();
+
+// File filter: Allow only files where mimetype starts with "image"
+const multerfilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image')) {
+        cb(null, true); // Accept file
+    } else {
+        cb(new AppError('Not an image! Please upload only images.', 400), false); // Reject
+    }
+}
+
+// Initialize multer with memory storage + image filter
+const upload = multer({
+    storage: multerStorage,
+    fileFilter: multerfilter
+})
+
+// Middleware: Handle multiple uploads for different fields
+// - imageCover: 1 file ONLY
+// - images: up to 3 files
+const uploadTourImages = upload.fields([
+    { name: 'imageCover', maxCount: 1 },
+    { name: 'images', maxCount: 3 }
+])
+
+// upload multiple files for single field
+// const uploadTourImages = upload.array('images', 3);
+
+
+// upload single file for single field
+// const uploadTourImage = upload.single('imageCover');
 
 // ------------------------------------------------------------
 // GET ALL TOURS
@@ -169,14 +250,14 @@ const getToursDistance = catchAsync(async (req, res, next) => {
                 distanceField: 'distance',
                 distanceMultiplier: unit === 'mi' ? 0.000621371 : 0.001
             }
-        },{
+        }, {
             $project: {
                 distance: 1,
                 name: 1
             }
         },
         {
-            $sort: { distance: -1}
+            $sort: { distance: -1 }
         }
     ])
 
@@ -247,5 +328,7 @@ module.exports = {
     alaisTopTours,
     getToursWithin,
     getToursDistance,
-    getTourStats
+    getTourStats,
+    imageModification,
+    uploadTourImages
 };

@@ -62,6 +62,7 @@ if (formData) {
     // Grab input elements
     const nameInput = document.getElementById("name");
     const emailInput = document.getElementById("email");
+    const photoInput = document.getElementById("photo");
 
     if (!nameInput || !emailInput) return;
 
@@ -75,16 +76,18 @@ if (formData) {
 
     // Check if any data has actually changed
     const isDataChanged =
-      originalEmail !== updatedEmail || originalName !== updatedName;
+      originalEmail !== updatedEmail || originalName !== updatedName || photoInput.files.length > 0;
 
     // Prevent unnecessary API call if no changes detected
     if (!isDataChanged) return;
-
+    let formData = new FormData();
+    formData.append('name', updatedName);
+    formData.append('email', updatedEmail);
+    if (photoInput.files.length > 0) {
+      formData.append('photo', photoInput.files[0]);
+    }
     // Send new data to API
-    updateUserInfo('infoUpdate', {
-      name: updatedName,
-      email: updatedEmail
-    });
+    updateUserInfo('infoUpdate', formData);
   });
 }
 

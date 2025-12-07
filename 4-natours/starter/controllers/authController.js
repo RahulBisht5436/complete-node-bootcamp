@@ -5,8 +5,49 @@ const catchAsync = require('../utils/catchAsync');  // Wrapper to catch async er
 const jwt = require('jsonwebtoken');                // JWT library for signing/verifying tokens
 const AppError = require('./../utils/appError');    // Custom error handler
 const bcrypt = require("bcryptjs");                 // For hashing and comparing passwords
+const multer = require('multer');
+const sharp = require("sharp");
 
 
+// Middleware to resize and process the uploaded image using Sharp
+const resizePhoto = catchAsync(async function (req, res, next) {
+    // If no file is uploaded, simply move to next middleware
+    if (!req.file) return next();
+
+    // Create a custom filename for the processed image
+    req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+
+    // Use sharp to resize and convert the image before saving it to disk
+    await sharp(req.file.buffer)
+        .resize(300, 300)          // Resize to 300x300 pixels
+        .toFormat('jpeg')          // Convert file type to JPEG
+        .jpeg({ quality: 50 })     // Compress image quality to 80%
+        .toFile(`public/img/users/${req.file.filename}`); // Save processed image
+
+    // Continue to the next middleware
+    next();
+});
+
+// Multer memory storage: keeps the uploaded image as a buffer in memory
+const multerStorage = multer.memoryStorage();
+
+// Multer filter: allows only image files to be uploaded
+const multerFilter = (req, file, cb) => {
+    // Check if file type starts with 'image'
+    if (file.mimetype.startsWith('image')) {
+        cb(null, true); // Accept file
+    } else {
+        // Reject non-image files and send an error
+        cb(new AppError('Not an image! Please upload only images.', 400), false);
+    }
+};
+
+// Initialize multer with defined storage and file filter
+const uploads = multer({ storage: multerStorage, fileFilter: multerFilter });
+
+
+// Using the multer for the multipart/form-data
+const uploadPhtoto = uploads.single('photo')
 
 // ----------------------------------------------------
 // Generate JWT Token for a given user ID
@@ -257,11 +298,24 @@ const updateMe = catchAsync(async function updateMe(req, res, next) {
 
     // Extract allowed fields
     const { name, email, role } = req.body;
+    if (req.file) {
+        user.photo = req.file.filename;
+    }
+    let userUpdateObject = {}
+    if (name) {
+        userUpdateObject.name = name
+    }
+    if (email) {
+        userUpdateObject.email = email
+    }
+    if (role) {
+        userUpdateObject.role = role
+    }
 
     // Update DB entry
     data = await User.findByIdAndUpdate(
         user.id,
-        { name, email },
+        userUpdateObject,
         { new: true, runValidators: true }
     );
 
@@ -343,7 +397,9 @@ module.exports = {
     protect,
     conditionalProtect,
     restrictTo,
+    uploadPhtoto,
     updatePassword,
     updateMe,
+    resizePhoto,
     deleteUser
 };

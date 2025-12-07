@@ -1,6 +1,5 @@
 // Import express
 const express = require('express');
-
 // Import user-related controller functions (not auth)
 const {
   createUser,
@@ -20,6 +19,8 @@ const {
   login,
   protect,
   updateMe,
+  uploadPhtoto,
+  resizePhoto,
   restrictTo
 } = require("./../controllers/authController");
 
@@ -50,7 +51,7 @@ userRouter.patch('/updatepassword', protect, updatePassword);
 
 
 // Update user profile (name/email only)
-userRouter.post('/updateme', protect, updateMe);
+userRouter.post('/updateme', protect, uploadPhtoto, resizePhoto, updateMe);
 
 // Give user profile Information
 userRouter.get('/getMe', protect, getMe);

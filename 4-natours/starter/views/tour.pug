@@ -2,6 +2,7 @@ extends base
 
 //- all the mixin for the tour are inside this mixin
 include ./mixin/tourMixin.pug
+//- include ./mixin/utilityMixin.pug
 
 block prepend head
   link(rel="stylesheet" ,href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css")
@@ -63,30 +64,28 @@ block content
       each para in description 
         p.description__text= para  
 
-
-  section.section-pictures
-    each image in data.images
-      +showImages(image)
+  if data.images && data.images.length > 0
+    section.section-pictures
+      each image in data.images
+        +showImages(image)
 
   section.section-map
     #map(data-locations=`${JSON.stringify(data.locations)}`)
 
-
-  if data.reviews.length > 0
+  if data.reviews && data.reviews.length > 0
     section.section-reviews
       .reviews
         each review in data.reviews
-          //- +utilityPrint(review)
           +renderReviews(review.user.name,review.review,review.rating,review.user.photo)
-
-  p.classtest= data.images[0]
 
   section.section-cta
     .cta
       .cta__img.cta__img--logo
         img(src='/img/logo-white.png', alt='Natours logo')
-      img.cta__img.cta__img--1(src=`/img/tours/${data.images[1]}`, alt='')
-      img.cta__img.cta__img--2(src=`/img/tours/${data.images[2]}`, alt='')
+      if data.images && data.images[1]
+        img.cta__img.cta__img--1(src=`/img/tours/${data.images[1]}`, alt='')
+      if data.images && data.images[2]
+        img.cta__img.cta__img--2(src=`/img/tours/${data.images[2]}`, alt='')
       .cta__content
         h2.heading-secondary What are you waiting for?
         p.cta__text #{data.duration} days. 1 adventure. Infinite memories. Make it yours today!
