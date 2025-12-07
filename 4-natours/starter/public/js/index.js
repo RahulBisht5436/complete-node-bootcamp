@@ -11,37 +11,37 @@ const formElement = document.querySelector(".form");
 // Check if the form exists on the page
 if (formElement) {
 
-    // Add event listener to handle form submission
-    formElement.addEventListener("submit", function (e) {
+  // Add event listener to handle form submission
+  formElement.addEventListener("submit", function (e) {
 
-        // Prevent the page from refreshing on form submission
-        e.preventDefault();
+    // Prevent the page from refreshing on form submission
+    e.preventDefault();
 
-        // Get the entered email and password values
-        const emailData = document.getElementById('email').value;
-        const passwordData = document.getElementById('password').value;
+    // Get the entered email and password values
+    const emailData = document.getElementById('email').value;
+    const passwordData = document.getElementById('password').value;
 
-        // Ensure both email and password are filled before calling login function
-        if (emailData && passwordData) {
-            // Call the imported login function
-            Login(emailData, passwordData);
-        }
-    });
+    // Ensure both email and password are filled before calling login function
+    if (emailData && passwordData) {
+      // Call the imported login function
+      Login(emailData, passwordData);
+    }
+  });
 }
 
 
 
 //logout functionality 
 const logoutButtons = document.querySelectorAll(".logout_button")
-if(logoutButtons.length >0){
-    logoutButtons.forEach(button=>{
-        console.log(button)
-        button.addEventListener("click",Logout)
-    })
+if (logoutButtons.length > 0) {
+  logoutButtons.forEach(button => {
+    console.log(button)
+    button.addEventListener("click", Logout)
+  })
 }
 
 
-
+// upadting the User information
 const formData = document.querySelector(".form-user-data");
 if (formData) {
   formData.addEventListener("submit", (e) => {
@@ -67,7 +67,22 @@ if (formData) {
       return;
     }
 
-
-    updateUserInfo(updatedEmail, updatedName, user);
+    const infoObjectAccount = {
+      name: updatedName,
+      email: updatedEmail
+    }
+    updateUserInfo('infoUpdate', infoObjectAccount);
   });
+}
+
+
+
+// Updating user password
+
+const passwordForm = document.querySelector(".form.form-user-settings")
+if(passwordForm){
+  passwordForm.addEventListener("submit",(e)=>{
+      e.preventDefault()
+      
+  })
 }
