@@ -27,8 +27,6 @@ const updateUserInfo = async function (type, infoObject) {
             return;
         }
 
-        console.log(infoObject, endPoint, "send data to server");
-
         // Send update request to backend
         const response = await axios({
             method,

@@ -5,7 +5,6 @@ import { showAlerts } from './utilities/alert';
 
 // Login function that sends user credentials to the backend API
 const Login = async function (email, password) {
-    console.log("ajsguasuauuydg")
     try {
         // Make a POST request to the login endpoint with email & password
         const response = await axios({
@@ -13,7 +12,6 @@ const Login = async function (email, password) {
             url: 'http://127.0.0.1:3000/api/v1/users/login',
             data: { email, password },
         });
-        console.log("endpoint hitted")
         // Check if backend returned a success status
         if (response.data.status === 'success') {
             // Show success alert on successful login
@@ -39,9 +37,6 @@ const Logout = async function () {
             method: "GET",
             url: "http://127.0.0.1:3000/logout"
         });
-
-        console.log(response, "this is the response");
-
         // If logout is successful according to backend response
         if (response.data.statusCode === 200) {
             showAlerts("success", "Logout Successfully");
@@ -55,7 +50,6 @@ const Logout = async function () {
     } catch (error) {
         // Show alert if API request fails
         showAlerts("error", "Not able to logout");
-        console.log(error); // Log actual error for debugging
     }
 }
 

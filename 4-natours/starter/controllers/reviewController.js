@@ -60,8 +60,6 @@ const createReviewPreHandler = catchAsync(async (req, res, next) => {
     if (!req.body.tourID) req.body.tour = req.params.tourId;
     // Auto-fill user ID from protect middleware
     if (!req.body.user) req.body.user = req.user.id;
-
-    console.log(req.body)
     next();
 
 });

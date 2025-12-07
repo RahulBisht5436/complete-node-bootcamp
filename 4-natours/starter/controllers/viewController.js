@@ -22,7 +22,6 @@ const getOverview = catchAsync(
   async (req, res) => {
     // Get all tour documents from the Tours collection
     const allToursData = await Tours.find();
-    console.log("called over view end point")
 
     // Render the overview.pug view with the data
     res.locals.userData = req.user
@@ -76,7 +75,6 @@ const login = catchAsync(async (req, res, next) => {
 })
 
 const logout = catchAsync(async (req, res, next) => {
-  console.log("isnide the currect handler")
   const cookieOptions = {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true
@@ -94,7 +92,6 @@ const logout = catchAsync(async (req, res, next) => {
 
 const account = async function (req,res,next) {
   const userObject = req.user
-  console.log(userObject)
   res.status(200).render('account',{
     title : "account",
     user : userObject

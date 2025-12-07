@@ -78,7 +78,6 @@ const protect = catchAsync(async function protect(req, res, next) {
     } else if (req.cookies.jwt) {
         token = req.cookies.jwt
     }
-    console.log(token, "i am inside the protect route")
 
     // If no token found
     if (!token) {
@@ -99,7 +98,6 @@ const protect = catchAsync(async function protect(req, res, next) {
     if (changePassword) {
         return next(new AppError("Password Changed Afterword kindly initiate new session ", 401));
     }
-    console.log("Protected route accessed by user:", freshUser.id);
     // Grant access to protected route
     req.user = freshUser;
     next();
@@ -123,14 +121,12 @@ const conditionalProtect = catchAsync(async function conditionalProtect(req, res
         // 3. Check if user still exists
         const freshUser = await User.findById(decoded.id);
         if (!freshUser) {
-            console.log("line returned 125")
             return next();
         }
 
         // 4. Check if user changed password after token was issued
         const changePassword = freshUser.changedPasswordAfter(decoded.iat);
         if (changePassword) {
-            console.log("line returned 132")
             return next();
         }
         // Grant access to protected route
@@ -269,8 +265,6 @@ const updateMe = catchAsync(async function updateMe(req, res, next) {
         { new: true, runValidators: true }
     );
 
-    console.log("updated user ...........")
-
     // Return updated user
     return res.status(200).json({
         status: 'success',
@@ -293,7 +287,6 @@ const restrictTo = (...roles) => {
         } else if (req.cookies.jwt) {
             token = req.cookies.jwt
         }
-        console.log("resteirc bajsdad")
         if (!token) {
             return next(new AppError("You are not logged in , kindly login to get access ", 500));
         }

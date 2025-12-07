@@ -12083,9 +12083,8 @@ var Login = exports.Login = /*#__PURE__*/function () {
     return _regenerator().w(function (_context) {
       while (1) switch (_context.p = _context.n) {
         case 0:
-          console.log("ajsguasuauuydg");
-          _context.p = 1;
-          _context.n = 2;
+          _context.p = 0;
+          _context.n = 1;
           return (0, _axios.default)({
             method: 'POST',
             url: 'http://127.0.0.1:3000/api/v1/users/login',
@@ -12094,9 +12093,8 @@ var Login = exports.Login = /*#__PURE__*/function () {
               password: password
             }
           });
-        case 2:
+        case 1:
           response = _context.v;
-          console.log("endpoint hitted");
           // Check if backend returned a success status
           if (response.data.status === 'success') {
             // Show success alert on successful login
@@ -12107,18 +12105,18 @@ var Login = exports.Login = /*#__PURE__*/function () {
               window.location.href = '/';
             }, 2500);
           }
-          _context.n = 4;
+          _context.n = 3;
           break;
-        case 3:
-          _context.p = 3;
+        case 2:
+          _context.p = 2;
           _t = _context.v;
           // Show error alert if login failed
           (0, _alert.showAlerts)('error', 'Check your email or password');
           console.log(_t); // Log actual error in console for debugging
-        case 4:
+        case 3:
           return _context.a(2);
       }
-    }, _callee, null, [[1, 3]]);
+    }, _callee, null, [[0, 2]]);
   }));
   return function Login(_x, _x2) {
     return _ref.apply(this, arguments);
@@ -12140,8 +12138,6 @@ var Logout = exports.Logout = /*#__PURE__*/function () {
           });
         case 1:
           response = _context2.v;
-          console.log(response, "this is the response");
-
           // If logout is successful according to backend response
           if (response.data.statusCode === 200) {
             (0, _alert.showAlerts)("success", "Logout Successfully");
@@ -12158,7 +12154,6 @@ var Logout = exports.Logout = /*#__PURE__*/function () {
           _t2 = _context2.v;
           // Show alert if API request fails
           (0, _alert.showAlerts)("error", "Not able to logout");
-          console.log(_t2); // Log actual error for debugging
         case 3:
           return _context2.a(2);
       }
@@ -12222,9 +12217,6 @@ var updateUserInfo = exports.updateUserInfo = /*#__PURE__*/function () {
         case 2:
           return _context.a(2);
         case 3:
-          console.log(infoObject, endPoint, "send data to server");
-
-          // Send update request to backend
           _context.n = 4;
           return (0, _axios.default)({
             method: method,

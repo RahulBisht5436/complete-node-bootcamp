@@ -70,8 +70,6 @@ const deleteTour = deleteOne(Tour);
 
 // /tours-within/:distance/center/:latlng/unit/:unit
 const getToursWithin = catchAsync(async (req, res, next) => {
-    console.log("inside getToursWithin");
-    console.log(req.params);
     const { distance, lnglat, unit } = req.params;
 
     if (!lnglat || !distance || !unit) {
@@ -84,7 +82,6 @@ const getToursWithin = catchAsync(async (req, res, next) => {
         return next(new AppError('Please provide latitude and longitude in the format lat,lng.', 400));
     }
 
-    console.log(distance, lat, lng, unit, distance / (unit === 'mi' ? 3963.2 : 6378.1));
 
     // Find all tours whose startLocation is within a certain distance
     // from the given longitude (lng) and latitude (lat)
@@ -156,7 +153,6 @@ const getTourStats = catchAsync(async (req, res, next) => {
 });
 
 const getToursDistance = catchAsync(async (req, res, next) => {
-    console.log("inside getToursDistance",req.params);
     const { lnglat, unit } = req.params;
     const [lng, lat] = lnglat.split(',');
     if (!lat || !lng || !unit) {
@@ -183,7 +179,6 @@ const getToursDistance = catchAsync(async (req, res, next) => {
             $sort: { distance: -1}
         }
     ])
-    console.log(data);
 
     return res.status(200).json({
         status: 'success',
@@ -199,7 +194,6 @@ const getToursDistance = catchAsync(async (req, res, next) => {
 const getMonthlyPlan = catchAsync(async (req, res, next) => {
 
     const year = req.params.year * 1; // Convert to number
-    console.log(year);
 
     const monthlyPlanData = await Tour.aggregate([
         {
