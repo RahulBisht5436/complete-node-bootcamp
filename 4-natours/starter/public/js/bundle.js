@@ -12184,8 +12184,15 @@ function _regenerator() { /*! regenerator-runtime -- Copyright (c) 2014-present,
 function _regeneratorDefine2(e, r, n, t) { var i = Object.defineProperty; try { i({}, "", {}); } catch (e) { i = 0; } _regeneratorDefine2 = function _regeneratorDefine(e, r, n, t) { function o(r, n) { _regeneratorDefine2(e, r, function (e) { return this._invoke(r, n, e); }); } r ? i ? i(e, r, { value: n, enumerable: !t, configurable: !t, writable: !t }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2)); }, _regeneratorDefine2(e, r, n, t); }
 function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
 function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
-// user is now available as a global variable from account.pug
-
+// updateUserInfo()
+// Handles updating either:
+// 1️⃣ Basic user info (name, email)
+// 2️⃣ User password
+//
+// Parameters:
+// - type: "infoUpdate" or "password"
+// - infoObject: Data object that will be sent in request body
+//
 var updateUserInfo = exports.updateUserInfo = /*#__PURE__*/function () {
   var _ref = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(type, infoObject) {
     var endPoint, method, response, _t;
@@ -12194,28 +12201,30 @@ var updateUserInfo = exports.updateUserInfo = /*#__PURE__*/function () {
         case 0:
           _context.p = 0;
           endPoint = "";
-          method = 'POST';
-          if (!(type == "infoUpdate")) {
+          method = "POST"; // Determine correct API endpoint & request method
+          if (!(type === "infoUpdate")) {
             _context.n = 1;
             break;
           }
           endPoint = "updateMe";
-          method = 'POST';
+          method = "POST"; // Update basic details uses POST
           _context.n = 3;
           break;
         case 1:
-          if (!(type == "password")) {
+          if (!(type === "password")) {
             _context.n = 2;
             break;
           }
-          endPoint = 'updatepassword';
-          method = 'PATCH';
+          endPoint = "updatepassword";
+          method = "PATCH"; // Password updates require PATCH
           _context.n = 3;
           break;
         case 2:
           return _context.a(2);
         case 3:
           console.log(infoObject, endPoint, "send data to server");
+
+          // Send update request to backend
           _context.n = 4;
           return (0, _axios.default)({
             method: method,
@@ -12224,13 +12233,17 @@ var updateUserInfo = exports.updateUserInfo = /*#__PURE__*/function () {
           });
         case 4:
           response = _context.v;
+          // Show success notification to user
           (0, _alert.showAlerts)('success', 'Updated successfully!');
           _context.n = 6;
           break;
         case 5:
           _context.p = 5;
           _t = _context.v;
+          // Show error message returned by the server
           (0, _alert.showAlerts)('error', _t.response.data.message);
+
+          // Log in console for debugging
           console.log(_t.response.data.message);
         case 6:
           return _context.a(2);
@@ -12241,6 +12254,8 @@ var updateUserInfo = exports.updateUserInfo = /*#__PURE__*/function () {
     return _ref.apply(this, arguments);
   };
 }();
+
+// Export function for use in other modules
 },{"axios":"../../node_modules/axios/index.js","./utilities/alert":"utilities/alert.js"}],"../../node_modules/regenerator-runtime/runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 /**
@@ -13107,81 +13122,101 @@ require("core-js/modules/web.dom.iterable.js");
 var _login = require("./login");
 var _accountUpdate = require("./accountUpdate");
 require("regenerator-runtime/runtime.js");
-// Import the named function "Login" from the "login.js" file (must use the same name)
+// Import named functions from other modules
 
-// Import Babel polyfill for older browsers (adds support for async/await, Promises, etc.)
+// Polyfill for older browsers (supports async/await and modern JS features)
 
-// Select the form element from the DOM
+/* ---------------------------------
+   USER LOGIN FUNCTIONALITY
+----------------------------------- */
+
+// Select login form from the DOM
 var formElement = document.querySelector(".form");
 
-// Check if the form exists on the page
+// Run login logic only if login form exists
 if (formElement) {
-  // Add event listener to handle form submission
+  // Submit handler for login form
   formElement.addEventListener("submit", function (e) {
-    // Prevent the page from refreshing on form submission
+    // Prevent auto page reload on form submission
     e.preventDefault();
 
-    // Get the entered email and password values
+    // Collect user input values
     var emailData = document.getElementById('email').value;
     var passwordData = document.getElementById('password').value;
 
-    // Ensure both email and password are filled before calling login function
+    // Only trigger login if both fields are provided
     if (emailData && passwordData) {
-      // Call the imported login function
       (0, _login.Login)(emailData, passwordData);
     }
   });
 }
 
-//logout functionality 
+/* ---------------------------------
+   USER LOGOUT FUNCTIONALITY
+----------------------------------- */
+
+// Select all logout buttons in navigation/header
 var logoutButtons = document.querySelectorAll(".logout_button");
+
+// Attach logout event to each logout button if present
 if (logoutButtons.length > 0) {
   logoutButtons.forEach(function (button) {
-    console.log(button);
     button.addEventListener("click", _login.Logout);
   });
 }
 
-// upadting the User information
+/* ---------------------------------
+   UPDATE USER BASIC INFORMATION
+   (Name & Email)
+----------------------------------- */
+
 var formData = document.querySelector(".form-user-data");
 if (formData) {
   formData.addEventListener("submit", function (e) {
     e.preventDefault();
+
+    // Grab input elements
     var nameInput = document.getElementById("name");
     var emailInput = document.getElementById("email");
     if (!nameInput || !emailInput) return;
 
-    // Original values from server-rendered attributes
+    // Original values rendered from server
     var originalEmail = emailInput.defaultValue;
     var originalName = nameInput.defaultValue;
 
-    // New values entered by user
+    // Updated values entered by user
     var updatedEmail = emailInput.value.trim();
     var updatedName = nameInput.value.trim();
 
-    // Only call update API if there is an actual change
+    // Check if any data has actually changed
     var isDataChanged = originalEmail !== updatedEmail || originalName !== updatedName;
-    if (!isDataChanged) {
-      return;
-    }
-    var infoObjectAccount = {
+
+    // Prevent unnecessary API call if no changes detected
+    if (!isDataChanged) return;
+
+    // Send new data to API
+    (0, _accountUpdate.updateUserInfo)('infoUpdate', {
       name: updatedName,
       email: updatedEmail
-    };
-    (0, _accountUpdate.updateUserInfo)('infoUpdate', infoObjectAccount);
+    });
   });
 }
 
-// Updating user password
+/* ---------------------------------
+   UPDATE USER PASSWORD FUNCTIONALITY
+----------------------------------- */
 
 var passwordForm = document.querySelector(".form.form-user-settings");
 if (passwordForm) {
   passwordForm.addEventListener("submit", function (e) {
     e.preventDefault();
+
+    // Fetch password field values from form
     var passwordCurrent = passwordForm.querySelector("#password-current").value;
     var password = passwordForm.querySelector("#password").value;
     var passwordConfirm = passwordForm.querySelector("#password-confirm").value;
-    console.log(passwordCurrent, password, passwordConfirm, "this is current password entered");
+
+    // Prepare object for password update API
     var infoObjectPassword = {
       newpassword: password,
       newpasswordconfirmed: passwordConfirm,

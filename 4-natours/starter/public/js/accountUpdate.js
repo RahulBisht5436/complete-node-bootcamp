@@ -1,34 +1,52 @@
-import axios from 'axios'
-import { showAlerts } from './utilities/alert'
-// user is now available as a global variable from account.pug
+import axios from 'axios';
+import { showAlerts } from './utilities/alert';
 
+// updateUserInfo()
+// Handles updating either:
+// 1️⃣ Basic user info (name, email)
+// 2️⃣ User password
+//
+// Parameters:
+// - type: "infoUpdate" or "password"
+// - infoObject: Data object that will be sent in request body
+//
 const updateUserInfo = async function (type, infoObject) {
     try {
-        let endPoint = ""
-        let method = 'POST'
-        if (type == "infoUpdate") {
-            endPoint = "updateMe"
-            method = 'POST'
-        } else if (type == "password") {
-            endPoint = 'updatepassword'
-            method = 'PATCH'
+        let endPoint = "";
+        let method = "POST";
+
+        // Determine correct API endpoint & request method
+        if (type === "infoUpdate") {
+            endPoint = "updateMe";
+            method = "POST"; // Update basic details uses POST
+        } else if (type === "password") {
+            endPoint = "updatepassword";
+            method = "PATCH"; // Password updates require PATCH
         } else {
-            return
+            // If type is invalid, exit silently
+            return;
         }
 
-        console.log(infoObject,endPoint,"send data to server")
+        console.log(infoObject, endPoint, "send data to server");
 
+        // Send update request to backend
         const response = await axios({
             method,
             url: `http://127.0.0.1:3000/api/v1/users/${endPoint}`,
-            data: infoObject
+            data: infoObject,
         });
-        showAlerts('success', 'Updated successfully!')
+
+        // Show success notification to user
+        showAlerts('success', 'Updated successfully!');
 
     } catch (error) {
-        showAlerts('error', error.response.data.message)
+        // Show error message returned by the server
+        showAlerts('error', error.response.data.message);
+
+        // Log in console for debugging
         console.log(error.response.data.message);
     }
-}
+};
 
-export { updateUserInfo }
+// Export function for use in other modules
+export { updateUserInfo };

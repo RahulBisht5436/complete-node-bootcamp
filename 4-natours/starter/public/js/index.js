@@ -1,99 +1,116 @@
-// Import the named function "Login" from the "login.js" file (must use the same name)
+// Import named functions from other modules
 import { Login, Logout } from './login';
 import { updateUserInfo } from './accountUpdate';
 
-// Import Babel polyfill for older browsers (adds support for async/await, Promises, etc.)
+// Polyfill for older browsers (supports async/await and modern JS features)
 import '@babel/polyfill';
 
-// Select the form element from the DOM
+/* ---------------------------------
+   USER LOGIN FUNCTIONALITY
+----------------------------------- */
+
+// Select login form from the DOM
 const formElement = document.querySelector(".form");
 
-// Check if the form exists on the page
+// Run login logic only if login form exists
 if (formElement) {
 
-  // Add event listener to handle form submission
+  // Submit handler for login form
   formElement.addEventListener("submit", function (e) {
 
-    // Prevent the page from refreshing on form submission
+    // Prevent auto page reload on form submission
     e.preventDefault();
 
-    // Get the entered email and password values
+    // Collect user input values
     const emailData = document.getElementById('email').value;
     const passwordData = document.getElementById('password').value;
 
-    // Ensure both email and password are filled before calling login function
+    // Only trigger login if both fields are provided
     if (emailData && passwordData) {
-      // Call the imported login function
       Login(emailData, passwordData);
     }
   });
 }
 
 
+/* ---------------------------------
+   USER LOGOUT FUNCTIONALITY
+----------------------------------- */
 
-//logout functionality 
-const logoutButtons = document.querySelectorAll(".logout_button")
+// Select all logout buttons in navigation/header
+const logoutButtons = document.querySelectorAll(".logout_button");
+
+// Attach logout event to each logout button if present
 if (logoutButtons.length > 0) {
   logoutButtons.forEach(button => {
-    console.log(button)
-    button.addEventListener("click", Logout)
-  })
+    button.addEventListener("click", Logout);
+  });
 }
 
 
-// upadting the User information
+/* ---------------------------------
+   UPDATE USER BASIC INFORMATION
+   (Name & Email)
+----------------------------------- */
+
 const formData = document.querySelector(".form-user-data");
+
 if (formData) {
   formData.addEventListener("submit", (e) => {
     e.preventDefault();
 
+    // Grab input elements
     const nameInput = document.getElementById("name");
     const emailInput = document.getElementById("email");
 
     if (!nameInput || !emailInput) return;
 
-    // Original values from server-rendered attributes
+    // Original values rendered from server
     const originalEmail = emailInput.defaultValue;
     const originalName = nameInput.defaultValue;
 
-    // New values entered by user
+    // Updated values entered by user
     const updatedEmail = emailInput.value.trim();
     const updatedName = nameInput.value.trim();
 
-    // Only call update API if there is an actual change
+    // Check if any data has actually changed
     const isDataChanged =
       originalEmail !== updatedEmail || originalName !== updatedName;
-    if (!isDataChanged) {
-      return;
-    }
 
-    const infoObjectAccount = {
+    // Prevent unnecessary API call if no changes detected
+    if (!isDataChanged) return;
+
+    // Send new data to API
+    updateUserInfo('infoUpdate', {
       name: updatedName,
       email: updatedEmail
-    }
-    updateUserInfo('infoUpdate', infoObjectAccount);
+    });
   });
 }
 
 
+/* ---------------------------------
+   UPDATE USER PASSWORD FUNCTIONALITY
+----------------------------------- */
 
-// Updating user password
+const passwordForm = document.querySelector(".form.form-user-settings");
 
-const passwordForm = document.querySelector(".form.form-user-settings")
 if (passwordForm) {
   passwordForm.addEventListener("submit", (e) => {
-    e.preventDefault()
+    e.preventDefault();
+
+    // Fetch password field values from form
     const passwordCurrent = passwordForm.querySelector("#password-current").value;
     const password = passwordForm.querySelector("#password").value;
     const passwordConfirm = passwordForm.querySelector("#password-confirm").value;
-    console.log(passwordCurrent, password, passwordConfirm, "this is current password entered")
 
+    // Prepare object for password update API
     const infoObjectPassword = {
       newpassword: password,
       newpasswordconfirmed: passwordConfirm,
       originpassword: passwordCurrent
-    }
-    updateUserInfo('password', infoObjectPassword)
+    };
 
-  })
+    updateUserInfo('password', infoObjectPassword);
+  });
 }
