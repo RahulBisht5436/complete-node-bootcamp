@@ -80,9 +80,20 @@ if (formData) {
 // Updating user password
 
 const passwordForm = document.querySelector(".form.form-user-settings")
-if(passwordForm){
-  passwordForm.addEventListener("submit",(e)=>{
-      e.preventDefault()
-      
+if (passwordForm) {
+  passwordForm.addEventListener("submit", (e) => {
+    e.preventDefault()
+    const passwordCurrent = passwordForm.querySelector("#password-current").value;
+    const password = passwordForm.querySelector("#password").value;
+    const passwordConfirm = passwordForm.querySelector("#password-confirm").value;
+    console.log(passwordCurrent, password, passwordConfirm, "this is current password entered")
+
+    const infoObjectPassword = {
+      newpassword: password,
+      newpasswordconfirmed: passwordConfirm,
+      originpassword: passwordCurrent
+    }
+    updateUserInfo('password', infoObjectPassword)
+
   })
 }
