@@ -44,7 +44,7 @@ userRouter.delete('/deleteUser', protect, restrictTo('user'), deleteUser);
 userRouter.post('/forgotpassword', forgotPassword);
 
 // Reset password using token from email
-userRouter.patch('/resetpassword/:token', protect, resetPassword);
+userRouter.patch('/resetpassword/:token', resetPassword);
 
 // Update password (logged-in user only)
 userRouter.patch('/updatepassword', protect, updatePassword);

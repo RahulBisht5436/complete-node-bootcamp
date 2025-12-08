@@ -1,6 +1,7 @@
 // Import named functions from other modules
 import { Login, Logout } from './login';
 import { updateUserInfo } from './accountUpdate';
+import { passwordChangeHandle } from './passwordChange';
 
 // Polyfill for older browsers (supports async/await and modern JS features)
 import '@babel/polyfill';
@@ -10,7 +11,7 @@ import '@babel/polyfill';
 ----------------------------------- */
 
 // Select login form from the DOM
-const formElement = document.querySelector(".form");
+const formElement = document.querySelector("form.form.loginForm");
 
 // Run login logic only if login form exists
 if (formElement) {
@@ -116,4 +117,17 @@ if (passwordForm) {
 
     updateUserInfo('password', infoObjectPassword);
   });
+}
+
+
+
+
+// password change form operations
+const passwordForgetUpdate = document.querySelector("form.password_forgot_update")
+if(passwordForgetUpdate){
+  passwordForgetUpdate.addEventListener('submit',(e)=>{
+    e.preventDefault()
+    console.log("arrived till here")
+    passwordChangeHandle()
+  })
 }

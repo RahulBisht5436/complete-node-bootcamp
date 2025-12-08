@@ -1,5 +1,6 @@
 // Import required modules
 const { promisify } = require('util');              // Convert callback-based functions to promises
+const { emailHandler } = require('./../utils/email')
 const User = require('./../Models/User');           // User model
 const catchAsync = require('../utils/catchAsync');  // Wrapper to catch async errors
 const jwt = require('jsonwebtoken');                // JWT library for signing/verifying tokens
@@ -67,6 +68,8 @@ const signinToken = async function (userId) {
 // ----------------------------------------------------
 const signup = catchAsync(async function signup(req, res, next) {
 
+    
+
     // Create new user document in DB
     const newUser = await User.create({
         name: req.body.name,
@@ -74,6 +77,12 @@ const signup = catchAsync(async function signup(req, res, next) {
         password: req.body.password,
         password_confirmed: req.body.password_confirmed
     });
+
+    // dynamic way of making the url string
+    const urlHost = req.get('host').replace("localhost", "127.0.0.1")
+    const url = `${req.protocol}://${urlHost}/account`
+    
+    const newEmailRespnonse = new emailHandler(newUser,url ).sendWelcome()
 
     // Send JWT token to user
     sendToken(newUser, 201, res);
@@ -122,7 +131,7 @@ const protect = catchAsync(async function protect(req, res, next) {
 
     // If no token found
     if (!token) {
-        return next(new AppError("You are not logged in , kindly login to get access fsfdsdfsd", 500));
+        return next(new AppError("You are not logged in , kindly login to get access", 500));
     }
 
     // 2. Verify token

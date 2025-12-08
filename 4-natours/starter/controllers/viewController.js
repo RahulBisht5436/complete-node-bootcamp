@@ -99,5 +99,10 @@ const account = async function (req,res,next) {
   
 }
 
+const resetPassword = catchAsync( async(req,res)=>{
+  // console.log(user)
+  return res.render('passwordReset')
+})
+
 // Exporting the functions so they can be used in viewRouter.js
-module.exports = { getOverview, getTourUI, login, logout , account };
+module.exports = { getOverview, getTourUI, login, logout , account ,resetPassword };

@@ -1,6 +1,6 @@
 // Importing required utilities and modules
 const AppError = require('../utils/appError');           // Custom error handler class
-const { sendEmail } = require('../utils/email');         // Email sending utility
+const { sendEmail, emailHandler } = require('../utils/email');         // Email sending utility
 const catchAsync = require('../utils/catchAsync');       // Wrapper to catch async errors
 const jwt = require("jsonwebtoken");                     // JWT library for token generation
 const crypto = require('crypto');                        // Node crypto for hashing reset token
@@ -73,7 +73,7 @@ const forgotPassword = catchAsync(async function (req, res, next) {
 
     // Find user by submitted email
     const user = await User.findOne({ email: req.body.email });
-
+    console.log(user)
     if (!user) {
         return next(new AppError("User email is wrong, kindly enter correct email", 404));
     }
@@ -85,18 +85,15 @@ const forgotPassword = catchAsync(async function (req, res, next) {
     await user.save({ validateBeforeSave: false });
 
     // URL to send to user's email
-    const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${resetToken}`;
+    // const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${resetToken}`;
+    const resetURL = `${req.protocol}://${req.get("host")}/resetPassword/${resetToken}`;
 
     // Message body sent via email
-    const resetMessage = `Forgot your password? Submit new password using this link:\n\n${resetURL}\n\nIf you didn't request this, please ignore.`;
+    // const resetMessage = `Forgot your password? Submit new password using this link:\n\n${resetURL}\n\nIf you didn't request this, please ignore.`;
 
     try {
         // Attempt to send reset email
-        await sendEmail({
-            email: user.email,
-            subject: "Password reset valid for 10 minutes",
-            text: resetMessage
-        });
+        new emailHandler(user,resetURL).forgotPasswordEmail()
 
         res.status(200).json({
             status: "success",
@@ -122,7 +119,7 @@ const forgotPassword = catchAsync(async function (req, res, next) {
 // Validates token, updates password
 // ---------------------------------------------
 const resetPassword = catchAsync(async function (req, res, next) {
-
+    console.log("right route hitted")
     // Hash token because DB stores hashed version
     const hashedToken = crypto
         .createHash("sha256")
@@ -134,7 +131,7 @@ const resetPassword = catchAsync(async function (req, res, next) {
         passwordResetToken: hashedToken,
         passwordResetExpires: { $gt: Date.now() }   // Check expiration
     });
-
+    
     if (!user) {
         return next(new AppError("user is not found or token expired"), 401);
     }
@@ -142,11 +139,10 @@ const resetPassword = catchAsync(async function (req, res, next) {
     // Set new password fields
     user.password = req.body.newpassword;
     user.password_confirmed = req.body.newpasswordconfirmed;
-
+    
     // Clear reset token fields
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
-
     // Save user with new password
     await user.save();
 

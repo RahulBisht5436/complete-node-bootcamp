@@ -5,6 +5,7 @@ import { showAlerts } from './utilities/alert';
 
 // Login function that sends user credentials to the backend API
 const Login = async function (email, password) {
+    console.log("called right function",email,password)
     try {
         // Make a POST request to the login endpoint with email & password
         const response = await axios({

@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');      // Email sending library
-const catchAsync = require('./catchAsync');    // Async wrapper (not used here)
 const pug = require('pug');
-const htmlToText = require('html-to-text');
+const { htmlToText } = require('html-to-text');
+// import { htmlToText } from 'html-to-text';
 
 // ------------------------------------------------------------
 // Creating an Email class and storing it into a constant called emailHandler
@@ -44,7 +44,7 @@ const emailHandler = class Email {
 
     // 1️⃣ Render HTML for the email using a Pug template file
     // template.pug file must exist inside /views/email/
-    const html = pug.renderFile(`${__dirname}/../views/email/${template}.pugs`, {
+    const html = pug.renderFile(`${__dirname}/../views/${template}.pug`, {
       firstName: this.firstName, // Provide data to Pug template
       url: this.url,
       subject: subject
@@ -57,7 +57,7 @@ const emailHandler = class Email {
       subject: subject,           // Email subject line
       url: this.url,              // Provided URL (used inside HTML)
       html,                       // HTML version of the email body
-      text: htmlToText.fromString(html) // Plain text fallback for email clients
+      text: htmlToText(html) // Plain text fallback for email clients
     }
 
     // 3️⃣ Create the transporter & send the mail
@@ -71,41 +71,48 @@ const emailHandler = class Email {
     // Simply calls send() with "welcome" template and a title
     await this.send("welcome", "Welcome to the Natours Family!");
   }
+  async forgotPasswordEmail() {
+    // Simply calls send() with "welcome" template and a title
+    await this.send("passwordResetEmail","This is Your Reset Password Url");
+  }
 }
 
-const sendEmail = async (options) => {
+
+// This is SendEmail is older way 
+// const sendEmail = async (options) => {
 
 
-  // --------------------------------------------------------
-  // Create transporter (email sending engine)
-  // Uses SMTP server credentials from environment variables
-  // --------------------------------------------------------
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,             // SMTP host (e.g., smtp.gmail.com)
-    port: Number(process.env.EMAIL_PORT),     // SMTP port (usually 465/587)
-    auth: {
-      user: process.env.ADMIN_EMAIL,          // Email address used to send mail
-      pass: process.env.ADMIN_PASSWORD        // Email password or app password
-    }
-  });
+//   // --------------------------------------------------------
+//   // Create transporter (email sending engine)
+//   // Uses SMTP server credentials from environment variables
+//   // --------------------------------------------------------
+//   const transporter = nodemailer.createTransport({
+//     host: process.env.EMAIL_HOST,             // SMTP host (e.g., smtp.gmail.com)
+//     port: Number(process.env.EMAIL_PORT),     // SMTP port (usually 465/587)
+//     auth: {
+//       user: process.env.ADMIN_EMAIL,          // Email address used to send mail
+//       pass: process.env.ADMIN_PASSWORD        // Email password or app password
+//     }
+//   });
 
-  // --------------------------------------------------------
-  // Email content configuration
-  // --------------------------------------------------------
-  const mailOptions = {
-    from: process.env.MAIL_FROM, // Sender name + email
-    to: options.email,                                     // Recipient email
-    subject: options.subject,                              // Subject line
-    text: options.text,                                     // Plain text body
-  };
+//   // --------------------------------------------------------
+//   // Email content configuration
+//   // --------------------------------------------------------
+//   const mailOptions = {
+//     from: process.env.MAIL_FROM, // Sender name + email
+//     to: options.email,                                     // Recipient email
+//     subject: options.subject,                              // Subject line
+//     text: options.text,                                     // Plain text body
+//   };
 
-  // --------------------------------------------------------
-  // Send the email using the transporter
-  // Returns a promise with email details
-  // --------------------------------------------------------
-  return await transporter.sendMail(mailOptions);
-};
+//   // --------------------------------------------------------
+//   // Send the email using the transporter
+//   // Returns a promise with email details
+//   // --------------------------------------------------------
+//   return await transporter.sendMail(mailOptions);
+// };
 
 
 // Export sendEmail function
-module.exports = { sendEmail, emailHandler };
+// module.exports = { sendEmail, emailHandler };   older form of data
+module.exports = { emailHandler };

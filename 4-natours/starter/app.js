@@ -4,7 +4,7 @@
 const express = require('express');
 const app = express();
 
-
+const cors = require('cors');
 // Core Node.js module used to work with file and directory paths safely
 const path = require('path');
 
@@ -25,6 +25,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 // for parsing the cookie like the express the param and query
 const cookieParser = require("cookie-parser")
 app.use(cookieParser())
+
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  credentials: true
+}));
 
 const morgan = require('morgan');
 const helmet = require('helmet');                    // Security headers
