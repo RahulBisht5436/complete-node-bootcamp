@@ -6,11 +6,13 @@ process.on('uncaughtException', err => {
 });
 
 
-const app = require('./app')
-const mongoose = require('mongoose');
 // LEARN : this is new way to set environment variables
 const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' });
+
+const app = require('./app')
+const mongoose = require('mongoose');
+
 
 const DB = process.env.DATABASE.replace(
     '<db_password>',

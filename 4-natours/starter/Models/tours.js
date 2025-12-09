@@ -177,7 +177,7 @@ tourSchema.pre('save', function (next) {
 //     this.pipeline().unshift({ $match: { secreteTours: { $ne: true } } });
 //     if(process.env.NODE_ENV==='development'){
 //     }
-    
+
 //     next();
 // });
 
