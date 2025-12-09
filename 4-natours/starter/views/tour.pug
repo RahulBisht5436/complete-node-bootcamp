@@ -8,8 +8,8 @@ block prepend head
   link(rel="stylesheet" ,href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css")
   //- script(src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js")
   //- script(src="/js/mapbox.js")
-
-
+block append head
+  script(src="https://js.stripe.com/v3/")
 
 block content
   section.section-header
@@ -77,7 +77,7 @@ block content
       .reviews
         each review in data.reviews
           +renderReviews(review.user.name,review.review,review.rating,review.user.photo)
-
+  
   section.section-cta
     .cta
       .cta__img.cta__img--logo
@@ -89,6 +89,9 @@ block content
       .cta__content
         h2.heading-secondary What are you waiting for?
         p.cta__text #{data.duration} days. 1 adventure. Infinite memories. Make it yours today!
-        button.btn.btn--green.span-all-rows Book tour now!
+        if user
+          button.process-tour-payment.btn.btn--green.span-all-rows(data-tour-id=`${data._id}`) Book tour now!
+        else
+          a.btn.btn--green.span-all-rows(href='/login') Login to book tour
 
 

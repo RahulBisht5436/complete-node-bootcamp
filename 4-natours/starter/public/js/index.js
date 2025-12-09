@@ -2,9 +2,11 @@
 import { Login, Logout } from './login';
 import { updateUserInfo } from './accountUpdate';
 import { passwordChangeHandle } from './passwordChange';
+import processTourPayment from './payment';
 
 // Polyfill for older browsers (supports async/await and modern JS features)
 import '@babel/polyfill';
+import { showAlerts } from './utilities/alert';
 
 /* ---------------------------------
    USER LOGIN FUNCTIONALITY
@@ -124,10 +126,27 @@ if (passwordForm) {
 
 // password change form operations
 const passwordForgetUpdate = document.querySelector("form.password_forgot_update")
-if(passwordForgetUpdate){
-  passwordForgetUpdate.addEventListener('submit',(e)=>{
+if (passwordForgetUpdate) {
+  passwordForgetUpdate.addEventListener('submit', (e) => {
     e.preventDefault()
     console.log("arrived till here")
     passwordChangeHandle()
+  })
+}
+
+
+// handling the tour payment process
+const tourPaymentButton = document.querySelectorAll("button.process-tour-payment.btn")
+if (tourPaymentButton.length > 0) {
+  tourPaymentButton.forEach((paymentButton) => {
+    paymentButton.addEventListener("click", (e) => {
+      let tourId
+      tourId = paymentButton.dataset.tourId
+      if (!tourId) {
+        showAlerts("error", "Sorry , Booking can't be processed")
+        return
+      }
+      processTourPayment(tourId)
+    })
   })
 }

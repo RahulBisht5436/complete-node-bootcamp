@@ -4,13 +4,15 @@ const AppError = require('../utils/appError')
 const catchAsync = require('../utils/catchAsync')
 
 
-const createCheckoutSession = catchAsync(async (req, res) => {
-    // get the currently booked tour
-    const tourId = req.params.tourId
-    if (!tourId) return next(new AppError('Please provide a valid tour id', 400))
-    const tour = await Tour.findById(tourId)
+const createCheckoutSession = catchAsync(async (req, res, next) => {
+    const tourId = req.params.tourId;
+    if (!tourId) return next(new AppError('Please provide a valid tour id', 400));
 
-    // create checkout session
+    const tour = await Tour.findById(tourId);
+    if (!tour || !tour.slug) {
+        return next(new AppError('Tour not found or slug missing', 400));
+    }
+
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         success_url: `${req.protocol}://${req.get("host")}/?alert=booking`,
@@ -30,14 +32,12 @@ const createCheckoutSession = catchAsync(async (req, res) => {
                 },
                 quantity: 1
             }
-        ],
+        ]
     });
 
-    res.status(200).json({
-        status: 'success',
-        session
-    })
-})
+    res.status(200).json({ status: 'success', session });
+});
+
 
 
 module.exports = { createCheckoutSession }

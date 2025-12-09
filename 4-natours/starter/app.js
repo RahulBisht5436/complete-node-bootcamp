@@ -59,27 +59,39 @@ const bookingRouter = require('./routes/bookingRoutes');
 // - X-Frame-Options (Prevents clickjacking)
 // - X-XSS-Protection
 // Whitelist external sources for Leaflet + OSM + Fonts
-
 const scriptSrcUrls = [
   "https://unpkg.com",
   "https://*.tile.openstreetmap.org",
-  "https://cdn.jsdelivr.net"
+  "https://cdn.jsdelivr.net",
+
+  // ⭐ Stripe Scripts
+  "https://js.stripe.com"
 ];
 
 const styleSrcUrls = [
   "https://unpkg.com",
-  "https://fonts.googleapis.com"
+  "https://fonts.googleapis.com",
+
+  // ⭐ Stripe Styles
+  "https://js.stripe.com"
 ];
 
 const fontSrcUrls = [
-  "https://fonts.gstatic.com"
+  "https://fonts.gstatic.com",
+
+  // ⭐ Stripe Fonts
+  "https://js.stripe.com"
 ];
 
 const connectSrcUrls = [
   "'self'",
-  "http://127.0.0.1:3000",    // 👈 Allow backend API requests
-  "http://localhost:3000",    // 👈 Optional
-  "https://cdn.jsdelivr.net",  // Axios CDN
+  "http://127.0.0.1:3000",
+  "http://localhost:3000",
+  "https://cdn.jsdelivr.net",
+
+  // ⭐ Stripe API / Webhooks
+  "https://api.stripe.com",
+  "https://js.stripe.com"
 ];
 
 app.use(
@@ -87,7 +99,6 @@ app.use(
     directives: {
       defaultSrc: ["'self'"],
 
-      // 👇 Only one connectSrc — includes backend URL
       connectSrc: [...connectSrcUrls],
 
       scriptSrc: ["'self'", "'unsafe-inline'", ...scriptSrcUrls],
@@ -98,10 +109,19 @@ app.use(
         "'self'",
         "data:",
         "blob:",
-        "https://*.tile.openstreetmap.org"
+        "https://*.tile.openstreetmap.org",
+
+        // ⭐ Stripe QR / logo assets
+        "https://*.stripe.com"
       ],
 
-      fontSrc: ["'self'", ...fontSrcUrls]
+      fontSrc: ["'self'", ...fontSrcUrls],
+
+      frameSrc: [
+        // ⭐ Stripe uses iframes
+        "'self'",
+        "https://js.stripe.com"
+      ]
     }
   })
 );
