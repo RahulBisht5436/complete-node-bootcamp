@@ -74,7 +74,7 @@ const newBooking = catchAsync(async (req, res, next) => {
     }
 
     // Redirect user after successful booking creation
-    res.redirect('/');
+    res.redirect('/my-tours');
 
     // Allow next middlewares to continue without query processing
     return next();

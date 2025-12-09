@@ -1,7 +1,7 @@
 // Importing the Tours model to interact with the MongoDB 'tours' collection
 const { title } = require('process');
 const Tours = require('./../Models/tours');
-
+const Bookings = require('./../Models/bookingModels');
 // Importing a utility function to handle async errors without using try/catch everywhere
 const catchAsync = require('./../utils/catchAsync');
 
@@ -52,9 +52,9 @@ const getTourUI = async (req, res) => {
       .lean();
 
     if (!tourData) {
-      return res.status(404).render('error.pug',{
-        title : "No Tour found",
-        message:"No Tour Found"
+      return res.status(404).render('error.pug', {
+        title: "No Tour found",
+        message: "No Tour Found"
       })
     }
 
@@ -86,23 +86,36 @@ const logout = catchAsync(async (req, res, next) => {
   return res.status(200).json({
     'status': "success",
     'statusCode': 200,
-    "token":''
+    "token": ''
   })
 })
 
-const account = async function (req,res,next) {
+const account = async function (req, res, next) {
   const userObject = req.user
-  res.status(200).render('account',{
-    title : "account",
-    user : userObject
+  res.status(200).render('account', {
+    title: "account",
+    user: userObject
   })
-  
+
 }
 
-const resetPassword = catchAsync( async(req,res)=>{
+const resetPassword = catchAsync(async (req, res) => {
   // console.log(user)
   return res.render('passwordReset')
 })
 
+
+const myTours = catchAsync(async (req, res) => {
+  const user = req.user
+  const bookingData = await Bookings.find({ user: user._id })
+  const tourIds = bookingData.map(booking => booking.tour)
+  const tours = await Tours.find({ _id: { $in: tourIds } })
+  res.status(200).render('overview', {
+    data: tours,
+    title: "My Tours"
+  })
+
+})
+
 // Exporting the functions so they can be used in viewRouter.js
-module.exports = { getOverview, getTourUI, login, logout , account ,resetPassword };
+module.exports = { getOverview, getTourUI, login, logout, account, resetPassword, myTours };
